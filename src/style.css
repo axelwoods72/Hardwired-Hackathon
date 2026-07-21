@@ -1,0 +1,107 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('fonts/PressStart2P-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #abb7c8 0%, #6c7176 100%);
+    height: 100dvh;
+    width: 100dvw;
+    margin: 1px;
+
+    padding-right: 3px;
+    padding: 1px;
+}
+
+.header-grid-container {
+    display: grid;
+    grid-template-columns: 15% 50% 35%; 
+    gap: 10px;
+    text-align: right;
+    height: 5%;
+}
+
+.app-menu-grid {
+    display: flex;
+    gap: 10px;
+    text-align: center;
+}
+
+.app-box {
+    flex: 1;
+}
+
+.app-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#active-app-title {
+    font-family: 'Press Start 2P', monospace;
+    height: 100px;
+    line-height: 100px;
+    font-size: 20px;
+    color: #541B21;
+    text-shadow: 2px 2px black;
+}
+
+#time-header {
+    font-family: 'Press Start 2P', monospace;
+    height: 100px;
+    line-height: 100px;
+    font-size: 20px;
+    color: #541B21;
+    text-shadow: 2px 2px black;
+}
+
+
+.app-function {
+    flex: 1;
+    position: relative;
+}
+
+.app-function > div {
+    display: none;
+    height: 100%;
+}
+
+.app-function > div.active {
+    display: flex;
+}
+
+
+#food-finder-app {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.parallelogram {
+	width: 250px;
+	height: 80px;
+	transform: skew(-20deg);
+	background: #c9b608;
+    outline: 2px solid darkgoldenrod;
+    box-shadow: 10px 10px black;
+}
+
+.parallelogram span {
+    display: inline-block;
+    
+    font-family: 'Press Start 2P', monospace;
+    line-height: 75px;
+    font-size: 13px;
+    color: #541B21;
+    text-shadow: 1px 1px black;
+
+    transform: skew(20deg);
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Desk App</title>
+        <script src="app.js"></script>
+        <script src="foodfinder.js"></script>
+        <link rel="stylesheet" href="style.css">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    </head>
+
+    <body>
+        <div class="header-grid-container">
+            <div id="time-header">time</div>
+            <div id="active-app-title">active app</div>
+            <div class="app-menu-grid">
+                <div class="app-box" data-clock="clock-app"><img src="media/clock_menu_icon.png" alt="Clock"></div>
+                <div class="app-box" data-weather="weather-app">weather</div>
+                <div class="app-box" data-food-finder="food-finder-app">food finder</div>
+            </div>
+        </div>
+
+        <div class="app-function">
+            <div id="food-finder-app" class="active">
+                <div class="parallelogram">
+                    <span>Find Restaurant</span>
+                </div>
+                <div class="parallelogram">
+                    <span>Save Restaurant</span>
+                </div>
+            </div>
+            <div id="clock-app">
+
+            </div>
+            <div id="weather-app">
+
+            </div>
+        </div>
+
+    </body>
+</html>
