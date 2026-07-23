@@ -11,6 +11,8 @@ const switchSound = new Audio('media/retro-hurt.mp3');
 function onLoad() {
     initWebSocket();
 
+    var initial_active_menu_box = document.querySelector(".app-box");
+    initial_active_menu_box.classList.add("current");
     var initial_active_app = document.getElementById(app_cycle[cur_app]);
     initial_active_app.classList.add("active");
     document.getElementById("active-app-title").textContent = active_app_title[cur_app];
@@ -54,4 +56,11 @@ function cycle_app() {
     cur_app_element = document.getElementById(app_cycle[cur_app]);
     cur_app_element.classList.add("active");
     document.getElementById("active-app-title").textContent = active_app_title[cur_app];
+
+    // update header menu
+    const menu_boxes = document.querySelectorAll(".app-box");
+    menu_boxes.forEach((box, i) => {
+        box.classList.toggle("current", i === cur_app);
+    });
+    
 }

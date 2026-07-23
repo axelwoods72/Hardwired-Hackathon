@@ -27,7 +27,7 @@ AsyncWebSocket ws("/ws");
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // setup filesystem
   if(!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
@@ -50,6 +50,7 @@ void setup() {
 
   // setup websocket
   ws.onEvent(onEvent);
+  server.addHandler(&ws);
 
   // webpage server routing
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
@@ -58,7 +59,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
+  delay(5000);
+  JSONVar obj;
+  obj["type"] = "nav";
+  ws.textAll(JSON.stringify(obj));
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -99,5 +103,5 @@ void celebrate() {
 }
 
 void save_food(JSONVar msg) {
-  
+
 }
