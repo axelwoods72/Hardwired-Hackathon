@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
         <title>Desk App</title>
-        <script src="app.js"></script>
+        <script src="navigation.js"></script>
         <script src="foodfinder.js"></script>
         <link rel="stylesheet" href="style.css">
 
@@ -18,13 +18,13 @@
             <div id="active-app-title">active app</div>
             <div class="app-menu-grid">
                 <div class="app-box" data-clock="clock-app"><img src="media/clock_menu_icon.png" alt="Clock"></div>
-                <div class="app-box" data-weather="weather-app">weather</div>
-                <div class="app-box" data-food-finder="food-finder-app">food finder</div>
+                <div class="app-box" data-weather="weather-app"><img src="media/weather_menu_icon.png" alt="Weather"></div>
+                <div class="app-box" data-food-finder="food-finder-app"><img src="media/food_menu_icon.png" alt="Food Finder"></div>
             </div>
         </div>
 
         <div class="app-function">
-            <div id="food-finder-app" class="active">
+            <div id="food-finder-app">
                 <div class="parallelogram">
                     <span>Find Restaurant</span>
                 </div>
@@ -32,11 +32,11 @@
                     <span>Save Restaurant</span>
                 </div>
             </div>
-            <div id="clock-app">
-
+            <div id="clock-app" >
+                <h1>CLOCK APP</h1>
             </div>
             <div id="weather-app">
-
+                <h1>WEATHER APP</h1>
             </div>
         </div>
 

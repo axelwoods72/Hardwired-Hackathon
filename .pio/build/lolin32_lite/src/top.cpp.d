@@ -204,4 +204,6 @@
  .pio/libdeps/lolin32_lite/ESPAsyncWebServer-esphome/src/AsyncWebSocket.h \
  .pio/libdeps/lolin32_lite/ESPAsyncWebServer-esphome/src/AsyncWebSynchronization.h \
  .pio/libdeps/lolin32_lite/ESPAsyncWebServer-esphome/src/AsyncEventSource.h \
- firmware/config.h
+ .pio/libdeps/lolin32_lite/Arduino_JSON/src/Arduino_JSON.h \
+ .pio/libdeps/lolin32_lite/Arduino_JSON/src/JSON.h \
+ .pio/libdeps/lolin32_lite/Arduino_JSON/src/JSONVar.h firmware/config.h
