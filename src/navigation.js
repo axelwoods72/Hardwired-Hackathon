@@ -1,7 +1,7 @@
 var gateway = `ws://${window.location.hostname}/ws`
 
-const app_cycle = ["clock-app", "weather-app", "food-finder-app"];
-const active_app_title = ["Clock", "Weather", "Food Finder"];
+const app_cycle = ["clock-app", "weather-app", "food-finder-app", "game-app"];
+const active_app_title = ["Clock", "Weather", "Food Finder", "Game"];
 var cur_app = 0;
 
 document.addEventListener('DOMContentLoaded', onLoad);
