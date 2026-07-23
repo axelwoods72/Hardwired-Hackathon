@@ -5,6 +5,7 @@
         <title>Desk App</title>
         <script src="app.js"></script>
         <script src="foodfinder.js"></script>
+        <script src="clock.js" defer></script>
         <link rel="stylesheet" href="style.css">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,17 +15,35 @@
 
     <body>
         <div class="header-grid-container">
-            <div id="time-header">time</div>
+            <div id="clock-hm"> 
+                <script src="clockhm.js"></script>
+            </div>
             <div id="active-app-title">active app</div>
             <div class="app-menu-grid">
-                <div class="app-box" data-clock="clock-app"><img src="media/clock_menu_icon.png" alt="Clock"></div>
+                <div class="app-box" data-clock="clock-hms"><img src="media/clock_menu_icon.png" alt="Clock"></div>
                 <div class="app-box" data-weather="weather-app">weather</div>
                 <div class="app-box" data-food-finder="food-finder-app">food finder</div>
             </div>
         </div>
 
         <div class="app-function">
-            <div id="food-finder-app" class="active">
+
+            <div id="clock-app" class="active">
+                   
+                        <script src="clockhms.js" defer></script>
+                            
+                    </script>
+            </div>
+
+        <div id = "clock-hms" class="active">
+            <div src="clockhms.js"></div>
+
+
+        </div>
+
+
+
+            <div id="food-finder-app">
                 <div class="parallelogram">
                     <span>Find Restaurant</span>
                 </div>
@@ -32,9 +51,7 @@
                     <span>Save Restaurant</span>
                 </div>
             </div>
-            <div id="clock-app">
 
-            </div>
             <div id="weather-app">
 
             </div>
