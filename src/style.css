@@ -77,7 +77,6 @@ html, body {
 
 
 #food-finder-app {
-    display: flex;
     flex-direction: column;
     gap: 20px;
     text-align: center;

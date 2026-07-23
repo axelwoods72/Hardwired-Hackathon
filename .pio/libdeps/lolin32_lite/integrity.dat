@@ -1,0 +1,3 @@
+esphome/ESPAsyncWebServer-esphome
+esphome/AsyncTCP-esphome
+arduino-libraries/Arduino_JSON @ ^0.2.0
