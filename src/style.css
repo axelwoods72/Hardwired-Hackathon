@@ -79,7 +79,6 @@ html, body {
 
 
 #food-finder-app {
-    display: flex;
     flex-direction: column;
     gap: 20px;
     text-align: center;
@@ -120,4 +119,38 @@ html, body {
     text-shadow: 1px 1px black;
 
     transform: skew(20deg);
+}
+
+#game-app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.game-wrapper {
+    position: relative;
+}
+
+#breakout-canvas {
+    background: #000;
+    outline: 2px solid darkgoldenrod;
+    box-shadow: 10px 10px black;
+    display: block;
+}
+
+#game-score {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #c9b608;
+    outline: 2px solid darkgoldenrod;
+    box-shadow: 4px 4px black;
+    padding: 6px 14px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: #541B21;
+    text-shadow: 1px 1px black;
+    z-index: 2;
 }
