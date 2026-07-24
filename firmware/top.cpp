@@ -12,6 +12,12 @@
 
 #define NAV_BUTTON_PIN 21
 
+// LED pin number
+int LED1 = 13;
+int LED2 = 12;
+int LED3 = 27;
+int LED4 = 26;
+
 // function declarations
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
@@ -28,6 +34,12 @@ AsyncWebSocket ws("/ws");
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+
+  // LED outputs
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
 
   // setup filesystem
   if(!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
@@ -100,6 +112,23 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
 void celebrate() {
   // tweak out
+  for (int i=0; i<3; i++) {
+    digitalWrite(LED1, HIGH);
+    delay(100);
+    digitalWrite(LED1, LOW);
+
+    digitalWrite(LED2, HIGH);
+    delay(200);
+    digitalWrite(LED2, LOW);
+
+    digitalWrite(LED3, HIGH);
+    delay(300);
+    digitalWrite(LED3, LOW);
+
+    digitalWrite(LED4, HIGH);
+    delay(400);
+    digitalWrite(LED4, LOW);
+  }
 }
 
 void save_food(JSONVar msg) {

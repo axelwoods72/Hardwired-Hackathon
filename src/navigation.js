@@ -16,6 +16,8 @@ function onLoad() {
     var initial_active_app = document.getElementById(app_cycle[cur_app]);
     initial_active_app.classList.add("active");
     document.getElementById("active-app-title").textContent = active_app_title[cur_app];
+    const top_time_display = document.getElementById("clock-hm");
+    top_time_display.classList.toggle("hide", cur_app == 0);
 
     switchSound.volume = 0.2;
 }
@@ -62,6 +64,9 @@ function cycle_app() {
     menu_boxes.forEach((box, i) => {
         box.classList.toggle("current", i === cur_app);
     });
+
+    const top_time_display = document.getElementById("clock-hm");
+    top_time_display.classList.toggle("hide", cur_app == 0);
 
     if (app_cycle[cur_app] === "food-finder-app" && typeof FoodFinder !== "undefined") {
         FoodFinder.onShow?.();
