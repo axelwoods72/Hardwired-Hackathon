@@ -5,6 +5,7 @@
         <title>Desk App</title>
         <script src="navigation.js"></script>
         <script src="foodfinder.js"></script>
+        <script src="breakout.js"></script>
         <link rel="stylesheet" href="style.css">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,9 +20,10 @@
             </div>
             <div id="active-app-title">active app</div>
             <div class="app-menu-grid">
-                <div class="app-box" data-clock="clock-app"><img src="media/clock_menu_icon.png" alt="Clock"></div>
-                <div class="app-box" data-weather="weather-app">weather</div>
-                <div class="app-box" data-food-finder="food-finder-app">food finder</div>
+                <div class="app-box"><img src="media/clock_menu_icon.png" alt="Clock"></div>
+                <div class="app-box"><img src="media/weather_menu_icon.png" alt="Weather"></div>
+                <div class="app-box"><img src="media/food_menu_icon.png" alt="Food Finder"></div>
+                <div class="app-box"><img src="media/game_menu_icon.png" alt="Game"></div>
             </div>
         </div>
 
@@ -34,12 +36,13 @@
                     <span>Save Restaurant</span>
                 </div>
             </div>
-            <div id="clock-app">
 
-            </div>
+            <div id="clock-app"></div>
+
             <div id="weather-app">
                 <h1>WEATHER APP</h1>
             </div>
+
             <div id="game-app">
                 <div class="game-wrapper">
                     <canvas id="breakout-canvas" width="360" height="500"></canvas>
