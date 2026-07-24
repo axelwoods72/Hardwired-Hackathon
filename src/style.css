@@ -97,12 +97,15 @@ html, body {
 }
 
 .app-function > div {
-    display: flex;
+    display: none;
+    width: 100%;
     height: 100%;
 }
 
 .app-function > div.active {
     display: flex;
+    width: 100%;
+    height: 100%;
 }
 
 
@@ -115,7 +118,6 @@ html, body {
 }
 
 #clock-app {
-    display: flex;
     flex-direction: column;
     gap: 20px;
     text-align: center;
@@ -123,9 +125,9 @@ html, body {
     align-items: center;
     font-family: 'Press Start 2P', monospace;
     line-height: 75px;
-    font-size: 13px;
-    color: #541B21;
-    text-shadow: 1px 1px black;
+    font-size: 40px;
+    color: #541B21;  
+    text-shadow: 3px 3px black;
 }
 
 .parallelogram {
@@ -149,8 +151,8 @@ html, body {
     transform: skew(20deg);
 }
 
+
 #game-app {
-    display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
