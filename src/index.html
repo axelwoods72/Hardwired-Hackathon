@@ -2,10 +2,19 @@
 
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>Desk App</title>
-        <script src="navigation.js"></script>
-        <script src="foodfinder.js"></script>
-        <script src="breakout.js"></script>
+        <script>
+            (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loaded once."):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+                key: "AIzaSyBKpS-tH1ksiumDqnwkTu1oxhLwFLxAMtQ",
+                v: "weekly",
+            });
+        </script>
+        <script src="navigation.js" defer></script>
+        <script src="fooddata.js" defer></script>
+        <script src="foodfinder.js" defer></script>
+        <script src="app.js" defer></script>
+        <script src="breakout.js" defer></script>
         <link rel="stylesheet" href="style.css">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +24,9 @@
 
     <body>
         <div class="header-grid-container">
-            <div id="clock-hm"><script src="clockhm.js"></script></div>
+            <div id="clock-hm">
+                <script src="clockhm.js"></script>
+            </div>
             <div id="active-app-title">active app</div>
             <div class="app-menu-grid">
                 <div class="app-box"><img src="media/clock_menu_icon.png" alt="Clock"></div>
@@ -26,14 +37,7 @@
         </div>
 
         <div class="app-function">
-            <div id="food-finder-app">
-                <div class="parallelogram">
-                    <span>Find Restaurant</span>
-                </div>
-                <div class="parallelogram">
-                    <span>Save Restaurant</span>
-                </div>
-            </div>
+            <div id="food-finder-app"></div>
 
             <div id="clock-app"><script src="clockhms.js"></script></div>
 

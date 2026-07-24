@@ -62,5 +62,8 @@ function cycle_app() {
     menu_boxes.forEach((box, i) => {
         box.classList.toggle("current", i === cur_app);
     });
-    
+
+    if (app_cycle[cur_app] === "food-finder-app" && typeof FoodFinder !== "undefined") {
+        FoodFinder.onShow?.();
+    }
 }
