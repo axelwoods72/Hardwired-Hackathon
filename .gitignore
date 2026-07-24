@@ -1,3 +1,4 @@
 .DS_store
 /firmware/config.h
 .pio/
+.vscode
