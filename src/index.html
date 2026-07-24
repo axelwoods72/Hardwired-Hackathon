@@ -10,9 +10,11 @@
                 v: "weekly",
             });
         </script>
+        <script src="navigation.js" defer></script>
         <script src="fooddata.js" defer></script>
         <script src="foodfinder.js" defer></script>
         <script src="app.js" defer></script>
+        <script src="breakout.js" defer></script>
         <link rel="stylesheet" href="style.css">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,19 +24,33 @@
 
     <body>
         <div class="header-grid-container">
-            <div id="time-header">--:--</div>
-            <div id="active-app-title">food finder</div>
+            <div id="clock-hm">
+                <script src="clockhm.js"></script>
+            </div>
+            <div id="active-app-title">active app</div>
             <div class="app-menu-grid">
-                <div class="app-box" data-app="clock-app"><img src="media/clock_menu_icon.png" alt="Clock"></div>
-                <div class="app-box" data-app="weather-app">weather</div>
-                <div class="app-box" data-app="food-finder-app">food finder</div>
+                <div class="app-box"><img src="media/clock_menu_icon.png" alt="Clock"></div>
+                <div class="app-box"><img src="media/weather_menu_icon.png" alt="Weather"></div>
+                <div class="app-box"><img src="media/food_menu_icon.png" alt="Food Finder"></div>
+                <div class="app-box"><img src="media/game_menu_icon.png" alt="Game"></div>
             </div>
         </div>
 
         <div class="app-function">
-            <div id="food-finder-app" class="active"></div>
+            <div id="food-finder-app"></div>
+
             <div id="clock-app"></div>
-            <div id="weather-app"></div>
+
+            <div id="weather-app">
+                <h1>WEATHER APP</h1>
+            </div>
+
+            <div id="game-app">
+                <div class="game-wrapper">
+                    <canvas id="breakout-canvas" width="360" height="500"></canvas>
+                    <div id="game-score">SCORE: <span id="score-value">0</span></div>
+                </div>
+            </div>
         </div>
 
     </body>
