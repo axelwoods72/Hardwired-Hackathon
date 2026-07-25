@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ball.dx = hitPos * 4;
     }
 
+    const SPEED_INCREMENT = 1.03; // 3% faster per brick hit
+    const MAX_SPEED = 9;          // cap so it never becomes unplayable
+
     bricks.forEach(b => {
       if (!b.alive) return;
       if (ball.x > b.x && ball.x < b.x + brickW && ball.y - ball.r < b.y + brickH && ball.y + ball.r > b.y) {
@@ -57,11 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.dy *= -1;
         score += 10;
         scoreEl.textContent = score;
+
+        // speed up slightly, capped
+        ball.dx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dx * SPEED_INCREMENT));
+        ball.dy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dy * SPEED_INCREMENT));
       }
     });
 
     if (ball.y > canvas.height + 20) gameOver = true;
-    if (bricks.every(b => !b.alive)) resetBricks();
+    if (bricks.every(b => !b.alive)) {
+      resetBricks();
+      ball.dx = ball.dx > 0 ? 3 : -3; // reset speed for the new round
+      ball.dy = -3;
+    }
   }
 
   function draw() {
