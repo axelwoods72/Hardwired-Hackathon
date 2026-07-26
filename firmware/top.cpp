@@ -72,8 +72,25 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   delay(5000);
+  cycleToNextApp();
+}
+
+void cycleToNextApp() {
   JSONVar obj;
   obj["type"] = "nav";
+  ws.textAll(JSON.stringify(obj));
+}
+
+void sendJoyStickInput(String direction) {
+  JSONVar obj;
+  obj["type"] = "joystick";
+  obj["direction"] = direction;
+  ws.textAll(JSON.stringify(obj));
+}
+
+void sendSelectButtonInput() {
+  JSONVar obj;
+  obj["type"] = "select";
   ws.textAll(JSON.stringify(obj));
 }
 
@@ -106,6 +123,8 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       celebrate();
     } else if (type == "save_food") {
       save_food(msg);
+    } else if (type == "update_app") {
+      update_app(msg);
     }
   }
 }
@@ -133,4 +152,8 @@ void celebrate() {
 
 void save_food(JSONVar msg) {
 
+}
+
+void update_app(JSONVar msg) {
+  
 }
