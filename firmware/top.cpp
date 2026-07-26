@@ -19,11 +19,20 @@ int LED2 = 12;
 int LED3 = 27;
 int LED4 = 26;
 
+// RGB pin number
+int REDpin = 12;
+int GREENpin = 14;
+int BLUEpin = 27;
+
 // function declarations
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
 void celebrate();
 void save_food(JSONVar msg);
+void cycleToNextApp();
+void sendJoyStickInput(String direction);
+void sendSelectButtonInput();
+void update_app(JSONVar msg);
 
 AsyncWebServer server(80);
 
@@ -40,6 +49,11 @@ void setup()
   pinMode(LED3, OUTPUT);
   pinMode(LED4, OUTPUT);
 
+  // RGB outputs
+  pinMode(REDpin, OUTPUT);
+  pinMode(GREENpin, OUTPUT);
+  pinMode(BLUEpin, OUTPUT);
+
   // setup filesystem
   if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
   {
@@ -47,23 +61,8 @@ void setup()
     return;
   }
 
-  // connect to WiFi
-  if (USE_EDUROAM)
-  {
-    WiFi.disconnect(true, true);
-    WiFi.mode(WIFI_STA);
-
-    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)IDENTITY, strlen(IDENTITY));
-    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)USERNAME, strlen(USERNAME));
-    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)UNI_PASSWORD, strlen(UNI_PASSWORD));
-    esp_wifi_sta_wpa2_ent_enable();
-
-    WiFi.begin(UNI_SSID);
-  }
-  else
-  {
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  }
+  // connect to WiFi 
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   Serial.print("Connecting");
   unsigned long start = millis();
@@ -146,12 +145,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     String msg_str = (char *)data;
     JSONVar msg = JSON.parse(msg_str);
     String type = msg["type"];
-    if (type == "food_chosen")
-    {
+    if (type == "food_chosen") {
       celebrate();
-    }
-    else if (type == "save_food")
-    {
+    } else if (type == "save_food") {
       save_food(msg);
     } else if (type == "update_app") {
       update_app(msg);
@@ -187,5 +183,28 @@ void save_food(JSONVar msg) {
 }
 
 void update_app(JSONVar msg) {
-  
+  String cur_app = msg["app"];
+  if (cur_app == "clock-app") {
+  analogWrite(REDpin, 255);
+	analogWrite(GREENpin, 255);
+	analogWrite(BLUEpin, 0);
+  }
+
+  else if (cur_app == "weather-app") {
+    analogWrite(REDpin, 0);
+    analogWrite(GREENpin, 0);
+    analogWrite(BLUEpin, 255);
+  }
+
+  else if (cur_app == "food-finder-app") {
+    analogWrite(REDpin, 255);
+    analogWrite(GREENpin, 0);
+    analogWrite(BLUEpin, 0);
+  }
+
+  else if (cur_app == "game-app") {
+    analogWrite(REDpin, 255);
+    analogWrite(GREENpin, 0);
+    analogWrite(BLUEpin, 255);
+  }
 }
