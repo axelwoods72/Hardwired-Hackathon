@@ -5,6 +5,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <Arduino_JSON.h>
+#include "esp_wpa2.h"
 
 #include "config.h"
 
@@ -24,14 +25,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
 void celebrate();
 void save_food(JSONVar msg);
 
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-
 AsyncWebServer server(80);
 
 AsyncWebSocket ws("/ws");
 
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
   Serial.begin(9600);
 
@@ -42,18 +41,43 @@ void setup() {
   pinMode(LED4, OUTPUT);
 
   // setup filesystem
-  if(!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
+  if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
+  {
     Serial.println("LittleFS Mount Failed");
     return;
   }
 
   // connect to WiFi
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting");
+  if (USE_EDUROAM)
+  {
+    WiFi.disconnect(true, true);
+    WiFi.mode(WIFI_STA);
 
-  while (WiFi.status() != WL_CONNECTED) {
+    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)IDENTITY, strlen(IDENTITY));
+    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)USERNAME, strlen(USERNAME));
+    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)UNI_PASSWORD, strlen(UNI_PASSWORD));
+    esp_wifi_sta_wpa2_ent_enable();
+
+    WiFi.begin(UNI_SSID);
+  }
+  else
+  {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  }
+
+  Serial.print("Connecting");
+  unsigned long start = millis();
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
+    if (millis() - start > 15000)
+    {
+      Serial.print("Failed to connect: ");
+      Serial.println(WiFi.status());
+      break;
+    }
   }
 
   Serial.println("\nWiFi Connected");
@@ -69,7 +93,8 @@ void setup() {
   server.begin();
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
   delay(5000);
   cycleToNextApp();
@@ -112,16 +137,21 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   }
 }
 
-void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
-  AwsFrameInfo *info = (AwsFrameInfo*)arg;
-  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
+{
+  AwsFrameInfo *info = (AwsFrameInfo *)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
+  {
     data[len] = 0;
-    String msg_str = (char*)data;
+    String msg_str = (char *)data;
     JSONVar msg = JSON.parse(msg_str);
     String type = msg["type"];
-    if (type == "food_chosen") {
+    if (type == "food_chosen")
+    {
       celebrate();
-    } else if (type == "save_food") {
+    }
+    else if (type == "save_food")
+    {
       save_food(msg);
     } else if (type == "update_app") {
       update_app(msg);
@@ -129,9 +159,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   }
 }
 
-void celebrate() {
+void celebrate()
+{
   // tweak out
-  for (int i=0; i<3; i++) {
+  for (int i = 0; i < 3; i++)
+  {
     digitalWrite(LED1, HIGH);
     delay(100);
     digitalWrite(LED1, LOW);
