@@ -162,6 +162,7 @@ const FoodFinder = (() => {
         if (key === 'Enter') {
             winnerPlace = results[sel];    // this fighter wins the battle
             addSaved(winnerPlace);         // ...and joins your saved team
+            window.ws?.send(JSON.stringify({ type: "food_chosen" }));
             setScreen('winner');
             return;
         }
@@ -241,8 +242,8 @@ const FoodFinder = (() => {
         return `<div class="ff-screen">
             <div class="ff-menu-list">
                 ${items.map((label, i) =>
-                    `<div class="parallelogram ${i === sel ? 'selected' : ''}"><span>${label}</span></div>`
-                ).join('')}
+            `<div class="parallelogram ${i === sel ? 'selected' : ''}"><span>${label}</span></div>`
+        ).join('')}
             </div>
             ${hintBar('&#8597; move &nbsp;&nbsp; [a] select')}
         </div>`;
