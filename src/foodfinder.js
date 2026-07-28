@@ -15,7 +15,7 @@ const FoodFinder = (() => {
     const SAVED_KEY = 'savedRestaurants';
 
     let root = null;
-    let screen = 'menu';       // menu | quiz | vs | results | winner | saved | detail
+    let screen = 'menu';       // menu | quiz | vs | results | winner | exit | saved | detail
     let sel = 0;               // highlighted index on list/grid screens
     let nodeId = QUIZ_START_NODE;
     let path = [];             // answers so far: [{ nodeId, optionIndex }]
@@ -103,7 +103,7 @@ const FoodFinder = (() => {
     function onKey(key) {
         const handlers = {
             menu: menuKey, quiz: quizKey, vs: vsKey,
-            results: resultsKey, winner: winnerKey, saved: savedKey, detail: detailKey,
+            results: resultsKey, winner: winnerKey, exit: exitKey, saved: savedKey, detail: detailKey,
         };
         handlers[screen]?.(key);
     }
@@ -170,8 +170,21 @@ const FoodFinder = (() => {
     }
 
     function winnerKey(key) {
-        if (key === 'Enter') setScreen('saved');       // A: go see your team
-        if (key === 'Escape') setScreen('results', sel); // B: back to pick another
+        if (key === 'Enter') setScreen('saved');   // A: go see your team
+        if (key === 'Escape') setScreen('exit');   // B: open the exit menu
+    }
+
+    // Two choices: start over at the main menu, or go back to the challengers.
+    // Same navigation as every list screen: up/down to move, A to pick, B to cancel.
+    function exitKey(key) {
+        if (key === 'Escape') { setScreen('winner'); return; }   // B: changed my mind
+        if (key === 'Enter') {
+            if (sel === 0) setScreen('menu');        // main menu (start over)
+            else setScreen('results', 0);            // keep looking
+            return;
+        }
+        moveList(key, 2);
+        render();
     }
 
     function savedKey(key) {
@@ -228,7 +241,7 @@ const FoodFinder = (() => {
     function render() {
         const screens = {
             menu: renderMenu, quiz: renderQuiz, vs: renderVS,
-            results: renderResults, winner: renderWinner, saved: renderSaved, detail: renderDetail,
+            results: renderResults, winner: renderWinner, exit: renderExit, saved: renderSaved, detail: renderDetail,
         };
         root.innerHTML = screens[screen]();
         root.querySelector('.selected')?.scrollIntoView({ block: 'nearest' });
@@ -317,7 +330,20 @@ const FoodFinder = (() => {
             <div class="winner-name">${esc(p.name)}</div>
             <div class="winner-address">${esc(p.address)}</div>
             <div class="winner-saved">&#9733; added to your saved fighters</div>
-            ${hintBar('[a] saved list &nbsp;&nbsp; [b] more results')}
+            ${hintBar('[a] saved list &nbsp;&nbsp; [b] exit')}
+        </div>`;
+    }
+
+    function renderExit() {
+        const items = ['main menu', 'keep looking'];
+        return `<div class="ff-screen">
+            <div class="question">leave this battle?</div>
+            <div class="ff-menu-list">
+                ${items.map((label, i) =>
+                    `<div class="parallelogram ${i === sel ? 'selected' : ''}"><span>${label}</span></div>`
+                ).join('')}
+            </div>
+            ${hintBar('&#8597; move &nbsp;&nbsp; [a] select &nbsp;&nbsp; [b] back')}
         </div>`;
     }
 
