@@ -20,6 +20,12 @@ function onLoad() {
     top_time_display.classList.toggle("hide", cur_app == 0);
 
     switchSound.volume = 0.2;
+
+    // TEMP: tap any header icon to cycle tiles for phone testing
+    // (real navigation happens via ESP32 "nav" WebSocket message — remove once hardware works)
+    document.querySelectorAll('.app-box').forEach(box => {
+        box.addEventListener('click', cycle_app);
+    });
 }
 
 function initWebSocket() {
