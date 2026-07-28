@@ -72,5 +72,10 @@ function cycle_app() {
         FoodFinder.onShow?.();
     }
 
-
+    // send msg to esp32 to change LED color
+    const msg_obj = {
+        type: "update_app"
+    }
+    msg_obj["app"] = app_cycle[cur_app];
+    ws.send(JSON.stringify(msg_obj));
 }
