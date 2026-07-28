@@ -1,17 +1,15 @@
 const SLEEP_DELAY = 60000; // one minute
 let sleepTimer;
 
-window.addEventListener('load', onWindowLoad);
-
-function onWindowLoad() {
+document.addEventListener('DOMContentLoaded', () => {
     window.ws?.addEventListener("message", (event) => {
         resetSleepTimer();
         const msg = JSON.parse(event.data);
-        if (msg.type === "sleep") {
-            goAwake(msg);
+        if (msg.type === "sleep" && document.getElementById("sleep-overlay").classList.contains("asleep")) {
+            goAwake();
         }
     });
-}
+});
 
 function sleepToggle(msg) {
     if (document.body.classList.contains("asleep")) {
@@ -22,7 +20,7 @@ function sleepToggle(msg) {
 }
 
 function goSleep() {
-    document.body.classList.add("asleep");
+    document.getElementById("sleep-overlay").classList.add("asleep");
     const msg = {
         type: "sleep"
     }
@@ -30,7 +28,8 @@ function goSleep() {
 }
 
 function goAwake() {
-    document.body.classList.remove("asleep");
+    document.getElementById("sleep-overlay").classList.remove("asleep");
+    console.log("Waking Up");
 }
 
 function resetSleepTimer() {
