@@ -71,4 +71,6 @@ function cycle_app() {
     if (app_cycle[cur_app] === "food-finder-app" && typeof FoodFinder !== "undefined") {
         FoodFinder.onShow?.();
     }
+
+
 }

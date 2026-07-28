@@ -22,6 +22,10 @@
 #define VRX_PIN 8
 #define VRY_PIN 10
 #define SW_PIN 33
+// RGB pins
+#define RED_PIN 12
+#define GREEN_PIN 14
+#define BLUE_PIN 27
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define STICK_DEADBAND 1500
@@ -108,6 +112,10 @@ void setup()
   pinMode(SEL_BUTTON_PIN, INPUT_PULLUP);
   pinMode(SW_PIN, INPUT_PULLUP);
 
+  pinMode(RED_PIN, OUTPUT);
+  pinMode(GREEN_PIN, OUTPUT);
+  pinMode(BLUE_PIN, OUTPUT);
+
   // Calibrate joystick
   delay(500);
   xCentre = calibrateStick(VRX_PIN);
@@ -162,6 +170,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     else if (type == "save_food")
     {
       save_food(msg);
+    }
+    else if (type == "update_app")
+    {
+      update_app(msg);
     }
   }
 }
@@ -264,6 +276,38 @@ void celebrate()
 
 void save_food(JSONVar msg)
 {
+}
+
+void update_app(JSONVar msg)
+{
+  String cur_app = msg["app"];
+  if (cur_app == "clock-app")
+  {
+    analogWrite(RED_PIN, 255);
+    analogWrite(GREEN_PIN, 255);
+    analogWrite(BLUE_PIN, 0);
+  }
+
+  else if (cur_app == "weather-app")
+  {
+    analogWrite(RED_PIN, 0);
+    analogWrite(GREEN_PIN, 0);
+    analogWrite(BLUE_PIN, 255);
+  }
+
+  else if (cur_app == "food-finder-app")
+  {
+    analogWrite(RED_PIN, 255);
+    analogWrite(GREEN_PIN, 0);
+    analogWrite(BLUE_PIN, 0);
+  }
+
+  else if (cur_app == "game-app")
+  {
+    analogWrite(RED_PIN, 255);
+    analogWrite(GREEN_PIN, 0);
+    analogWrite(BLUE_PIN, 255);
+  }
 }
 
 /**********************************************************************/
