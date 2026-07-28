@@ -29,7 +29,7 @@
 // Ultrasonic pins
 #define TRIG_PIN 32
 #define ECHO_PIN 15
-
+// Misc.
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define STICK_DEADBAND 1500
 #define WAVE_DIST_THRESHOLD_CM 15
@@ -73,6 +73,8 @@ String lastStickDirection = "none";
 
 unsigned long lastWaveTime = 0;
 bool wasClose = false;
+
+bool isAsleep = false;
 
 /**********************************************************************/
 
@@ -186,6 +188,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     {
       update_app(msg);
     }
+    else if (type == "sleep")
+    {
+      isAsleep = true;
+      sleepLEDs();
+    }
   }
 }
 
@@ -287,6 +294,16 @@ void handleUltrasonic()
     JSONVar obj;
     obj["type"] = "sleep";
     ws.textAll(JSON.stringify(obj));
+    if (isAsleep)
+    {
+      wakeLEDs();
+      isAsleep = false;
+    }
+    else
+    {
+      sleepLEDs();
+      isAsleep = true;
+    }
     lastWaveTime = millis();
   }
   wasClose = isClose;
@@ -359,6 +376,44 @@ void KnightRiderLEDs()
   updateLEDs(1);
   delay(50);
   updateLEDs(0);
+}
+
+void sleepLEDs()
+{
+  byte pattern = 0b11111111;
+  updateLEDs(pattern);
+  delay(150);
+
+  // Converging inwards
+  int pairs[4][2] = {{0, 7}, {1, 6}, {2, 5}, {3, 4}};
+  int stepDelay = 150;
+  for (int i = 0; i < 4; i++)
+  {
+    pattern &= ~(1 << pairs[i][0]);
+    pattern &= ~(1 << pairs[i][1]);
+    updateLEDs(pattern);
+    delay(stepDelay);
+    stepDelay += 100; // slow down each step
+  }
+}
+
+void wakeLEDs()
+{
+  byte pattern = 0b00000000; // all off
+  updateLEDs(pattern);
+  delay(300);
+
+  // Diverging Outwards
+  int pairs[4][2] = {{3, 4}, {2, 5}, {1, 6}, {0, 7}};
+  int stepDelay = 300;
+  for (int i = 0; i < 4; i++)
+  {
+    pattern |= (1 << pairs[i][0]);
+    pattern |= (1 << pairs[i][1]);
+    updateLEDs(pattern);
+    delay(stepDelay);
+    stepDelay -= 70; // speed up each step
+  }
 }
 
 /**********************************************************************/

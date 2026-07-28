@@ -5,8 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.ws?.addEventListener("message", (event) => {
         resetSleepTimer();
         const msg = JSON.parse(event.data);
-        if (msg.type === "sleep" && document.getElementById("sleep-overlay").classList.contains("asleep")) {
-            goAwake();
+        if (msg.type === "sleep") {
+            if (document.getElementById("sleep-overlay").classList.contains("asleep")) {
+                goAwake();
+            } else {
+                goSleep();
+            }
         }
     });
 });
