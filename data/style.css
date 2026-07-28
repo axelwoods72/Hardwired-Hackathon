@@ -13,7 +13,6 @@ html, body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: linear-gradient(to bottom, #abb7c8 0%, #6c7176 100%);
     height: 100dvh;
     width: 100dvw;
     margin: 0;
@@ -23,6 +22,32 @@ html, body {
     padding-left: 10px;
     padding-right: 25px;
     padding-bottom: env(safe-area-inset-bottom);
+
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s ease, visibility 0s linear 0s;
+}
+
+body {
+    background: linear-gradient(to bottom, #e8734a 0%, #f4a261 100%);
+}
+
+#sleep-overlay {
+    position: fixed;
+    inset: 0;
+    background: black;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+    z-index: 9999;
+}
+
+#sleep-overlay.asleep {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.6s ease, visibility 0s linear 0s;
 }
 
 
@@ -495,4 +520,97 @@ body:has(#stack-app.active) .header-grid-container {
 body:has(#game-app.active) .app-function,
 body:has(#stack-app.active) .app-function {
     height: 100dvh;
+}
+
+.opt-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 10px;
+    transition: transform 0.15s ease;
+}
+
+.option-card.selected .opt-icon {
+    transform: scale(1.2);
+}
+
+/* ---------- weather app ---------- */
+
+#weather-app {
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    color: #541B21;
+    text-shadow: 1px 1px black;
+    justify-content: center;
+    align-items: stretch;
+    height: 100%;
+    max-height: 100%;
+    gap: clamp(4px, 2vh, 20px);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#weather-app > div {
+    padding: clamp(2px, 1vh, 10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+}
+
+.current-weather-container {
+    flex: 2;
+    font-size: clamp(11px, 2.7vh, 20px);
+    gap: clamp(1px, 0.4vh, 3px);
+}
+
+.current-weather-container > div {
+    padding: clamp(0px, 0.3vh, 2px);
+}
+
+#cur-weather-icon {
+    font-size: clamp(40px, 13vh, 95px);
+}
+
+.forecast-container {
+    flex: 3;
+    font-size: clamp(9px, 1.9vh, 14px);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.forecast-container h2 {
+    font-size: clamp(10px, 1.8vh, 15px);
+    margin: 0 0 clamp(1px, 0.6vh, 5px);
+}
+
+.forecast-days-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: clamp(4px, 1.4vh, 14px);
+    flex: 1;
+    min-height: 0;
+}
+
+.forecast-day-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    padding: clamp(1px, 0.4vh, 3px);
+    background-color: #c9b608;
+    outline: 2px solid darkgoldenrod;
+}
+
+.forecast-weather-icon {
+    font-size: clamp(20px, 5.5vh, 42px);
+}
+
+.forecast-high-temp,
+.forecast-low-temp {
+    white-space: nowrap;
 }

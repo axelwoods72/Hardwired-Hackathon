@@ -77,4 +77,11 @@ function cycle_app() {
     if (app_cycle[cur_app] === "food-finder-app" && typeof FoodFinder !== "undefined") {
         FoodFinder.onShow?.();
     }
+
+    // send msg to esp32 to change LED color
+    const msg_obj = {
+        type: "update_app"
+    }
+    msg_obj["app"] = app_cycle[cur_app];
+    ws.send(JSON.stringify(msg_obj));
 }

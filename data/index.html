@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Desk App</title>
+        <script>
+            (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loaded once."):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+                key: "AIzaSyBKpS-tH1ksiumDqnwkTu1oxhLwFLxAMtQ",
+                v: "weekly",
+            });
+        </script>
+        <script src="navigation.js" defer></script>
+        <script src="sleep.js" defer></script>
+        <script src="fooddata.js" defer></script>
+        <script src="foodfinder.js" defer></script>
+        <script src="app.js" defer></script>
+        <script src="breakout.js" defer></script>
+        <link rel="stylesheet" href="style.css">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    </head>
+
+    <body>
+        <div id="sleep-overlay" class="asleep"></div>
+        <div class="header-grid-container">
+            <div id="clock-hm">
+                <script src="clockhm.js"></script>
+            </div>
+            <div id="active-app-title">active app</div>
+            <div class="app-menu-grid">
+                <div class="app-box"><img src="media/clock_menu_icon.png" alt="Clock"></div>
+                <div class="app-box"><img src="media/weather_menu_icon.png" alt="Weather"></div>
+                <div class="app-box"><img src="media/food_menu_icon.png" alt="Food Finder"></div>
+                <div class="app-box"><img src="media/game_menu_icon.png" alt="Game"></div>
+            </div>
+        </div>
+
+        <div class="app-function">
+            <div id="food-finder-app"></div>
+
+            <div id="clock-app"><script src="clockhms.js"></script></div>
+
+            <div id="weather-app">
+                <div class="current-weather-container">
+                    <h2>Now</h2>
+                    <div id="cur-weather-icon"></div>
+                    <div id="cur-temp"></div>
+                    <div id="cur-humidity"></div>
+                    <div id="cur-feels-like"></div>
+                    <div id="cur-wind"></div>
+                    <div id="cur-gusts"></div>
+                    <div id="cur-precipitation"></div>
+                </div>
+
+                <div class="forecast-container">
+                    <h2>7-Day Forecast</h2>
+                    <div class="forecast-days-row">
+                        <div class="forecast-day-container">
+                            <h2>Today</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Tmrw</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Day 3</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Day 4</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Day 5</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Day 6</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                        <div class="forecast-day-container">
+                            <h2>Day 7</h2>
+                            <div class="forecast-weather-icon"></div>
+                            <div class="forecast-high-temp"></div>
+                            <div class="forecast-low-temp"></div>
+                        </div>
+                    </div>
+                </div>
+                <script src="weather.js"></script>
+            </div>
+
+            <div id="game-app">
+                <div class="game-wrapper">
+                    <canvas id="breakout-canvas" width="360" height="500"></canvas>
+                    <div id="game-score">SCORE: <span id="score-value">0</span></div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
