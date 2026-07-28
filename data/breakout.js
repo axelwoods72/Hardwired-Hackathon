@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const gameAppEl = document.getElementById('game-app');
 
   const paddle = { w: 70, h: 10, x: canvas.width / 2 - 35, y: canvas.height - 25, speed: 8 };
-  const ball = { x: canvas.width / 2, y: canvas.height - 40, r: 6, dx: 3, dy: -3 };
+  const ball = { x: canvas.width / 2, y: canvas.height - 40, r: 6, dx: 2, dy: -2 };
 
   const rows = 5, cols = 6, brickW = 50, brickH = 16, pad = 6, top = 40;
   let bricks = [];
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetGame() {
     score = 0;
     scoreEl.textContent = score;
-    ball.x = canvas.width / 2; ball.y = canvas.height - 40; ball.dx = 3; ball.dy = -3;
+    ball.x = canvas.width / 2; ball.y = canvas.height - 40; ball.dx = 2; ball.dy = -2;
     resetBricks();
     gameOver = false;
     won = false;
@@ -53,38 +53,72 @@ document.addEventListener('DOMContentLoaded', () => {
     if (keys.right) paddle.x += paddle.speed;
     paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, paddle.x));
 
+    const prevBallY = ball.y;
+
     ball.x += ball.dx;
     ball.y += ball.dy;
+
     if (ball.x < ball.r || ball.x > canvas.width - ball.r) ball.dx *= -1;
     if (ball.y < ball.r) ball.dy *= -1;
 
-    if (ball.y + ball.r > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.w && ball.dy > 0) {
-      ball.dy *= -1;
-      const hitPos = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
-      ball.dx = hitPos * 4;
+    // paddle collision: full rectangle (top + sides), same axis-based
+    // approach as the brick collision — so a side clip bounces correctly
+    // instead of silently sliding past
+    const padLeft = paddle.x, padRight = paddle.x + paddle.w;
+    const padTop = paddle.y, padBottom = paddle.y + paddle.h;
+
+    const padOverlapX = Math.min(ball.x + ball.r, padRight) - Math.max(ball.x - ball.r, padLeft);
+    const padOverlapY = Math.min(ball.y + ball.r, padBottom) - Math.max(ball.y - ball.r, padTop);
+
+    if (padOverlapX > 0 && padOverlapY > 0 && ball.dy > 0) {
+      if (padOverlapX < padOverlapY) {
+        ball.dx *= -1;
+      } else {
+        ball.dy *= -1;
+        const hitPos = (ball.x - (padLeft + paddle.w / 2)) / (paddle.w / 2);
+        ball.dx = hitPos * 4;
+      }
+    } else if (ball.dy > 0 && ball.y - ball.r > padBottom) {
+      // ball has fully passed below the paddle without ever touching it — instant miss
+      gameOver = true;
+      return;
     }
 
-    const SPEED_INCREMENT = 1.03;
-    const MAX_SPEED = 9;
+    const SPEED_INCREMENT = 1.02;
+    const MAX_SPEED = 6;
 
-    bricks.forEach(b => {
-      if (!b.alive) return;
-      if (ball.x > b.x && ball.x < b.x + brickW && ball.y - ball.r < b.y + brickH && ball.y + ball.r > b.y) {
+    for (const b of bricks) {
+      if (!b.alive) continue;
+
+      // AABB overlap test between the ball's bounding box and the brick
+      const overlapX = Math.min(ball.x + ball.r, b.x + brickW) - Math.max(ball.x - ball.r, b.x);
+      const overlapY = Math.min(ball.y + ball.r, b.y + brickH) - Math.max(ball.y - ball.r, b.y);
+
+      if (overlapX > 0 && overlapY > 0) {
         b.alive = false;
-        ball.dy *= -1;
         score += 10;
         scoreEl.textContent = score;
 
+        // bounce along whichever axis had the smaller overlap —
+        // that's the side the ball actually hit (top/bottom vs left/right)
+        if (overlapX < overlapY) {
+          ball.dx *= -1;
+        } else {
+          ball.dy *= -1;
+        }
+
         ball.dx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dx * SPEED_INCREMENT));
         ball.dy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dy * SPEED_INCREMENT));
-      }
-    });
 
+        break; // only one brick can break per frame — stops multi-brick tunneling
+      }
+    }
+
+    // safety net, in case the ball somehow still gets past the line check
     if (ball.y > canvas.height + 20) gameOver = true;
     if (bricks.every(b => !b.alive)) won = true;
   }
 
-  // button hitboxes, shared between draw() and the click handler
   const restartBtn = { x: canvas.width / 2 - 90, y: canvas.height / 2 + 20, w: 80, h: 34 };
   const exitBtn    = { x: canvas.width / 2 + 10, y: canvas.height / 2 + 20, w: 80, h: 34 };
 
@@ -146,8 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gameOver && !won) return;
 
     const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
 
     if (pointInBtn(clickX, clickY, restartBtn)) {
       resetGame();
