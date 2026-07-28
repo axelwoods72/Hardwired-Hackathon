@@ -26,9 +26,15 @@
 #define RED_PIN 12
 #define GREEN_PIN 14
 #define BLUE_PIN 27
+// Ultrasonic pins
+#define TRIG_PIN 32
+#define ECHO_PIN 15
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define STICK_DEADBAND 1500
+#define WAVE_DIST_THRESHOLD_CM 15
+#define WAVE_COOLDOWN_MS 1000
+#define SPEED_OF_SOUND_CM_US 0.0343
 
 /**********************************************************************/
 /* Function prototypes */
@@ -39,10 +45,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
 void handleNavButton();
 void handleSelButton();
 void handleJoyStick();
+void handleUltrasonic();
 void celebrate();
 void KnightRiderLEDs();
 void save_food(JSONVar msg);
 int calibrateStick(int pin);
+int find_dist_cm();
 
 /**********************************************************************/
 /* Global vars */
@@ -57,12 +65,14 @@ unsigned long last_nav_change = 0;
 int sel_button_prev = HIGH;
 int debounced_sel_curr = HIGH;
 unsigned long last_sel_change = 0;
-
 const unsigned short debounceDelay = 50;
 
 int xCentre = 4000;
 int yCentre = 4000;
 String lastStickDirection = "none";
+
+unsigned long lastWaveTime = 0;
+bool wasClose = false;
 
 /**********************************************************************/
 
@@ -111,7 +121,8 @@ void setup()
   pinMode(NAV_BUTTON_PIN, INPUT_PULLUP);
   pinMode(SEL_BUTTON_PIN, INPUT_PULLUP);
   pinMode(SW_PIN, INPUT_PULLUP);
-
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
@@ -266,6 +277,21 @@ void handleJoyStick()
   lastStickDirection = stickDirection;
 }
 
+void handleUltrasonic()
+{
+  int dist_cm = find_dist_cm();
+  bool isClose = (dist_cm && dist_cm < WAVE_DIST_THRESHOLD_CM);
+  if (isClose && !wasClose && (millis() - lastWaveTime > WAVE_COOLDOWN_MS))
+  {
+    Serial.println("Hand wave detected - toggle sleep");
+    JSONVar obj;
+    obj["type"] = "sleep";
+    ws.textAll(JSON.stringify(obj));
+    lastWaveTime = millis();
+  }
+  wasClose = isClose;
+}
+
 /**********************************************************************/
 
 void celebrate()
@@ -313,13 +339,6 @@ void update_app(JSONVar msg)
 /**********************************************************************/
 /* LED sequences */
 
-void updateLEDs(byte pattern)
-{
-  digitalWrite(LED_LATCH_PIN, LOW);
-  shiftOut(LED_DATA_PIN, LED_CLOCK_PIN, LSBFIRST, pattern);
-  digitalWrite(LED_LATCH_PIN, HIGH);
-}
-
 void KnightRiderLEDs()
 {
   for (int j = 0; j < 3; j++)
@@ -344,6 +363,13 @@ void KnightRiderLEDs()
 
 /**********************************************************************/
 
+void updateLEDs(byte pattern)
+{
+  digitalWrite(LED_LATCH_PIN, LOW);
+  shiftOut(LED_DATA_PIN, LED_CLOCK_PIN, LSBFIRST, pattern);
+  digitalWrite(LED_LATCH_PIN, HIGH);
+}
+
 int calibrateStick(int pin)
 {
   int sum = 0;
@@ -354,4 +380,21 @@ int calibrateStick(int pin)
   }
 
   return sum / 20;
+}
+
+int find_dist_cm()
+{
+  digitalWrite(TRIG_PIN, LOW); // Ensure low first
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  int time_elapsed_us = pulseIn(ECHO_PIN, HIGH, 11662); // timeout after 2m
+  if (time_elapsed_us == 0)
+  {
+    return -1; // out of range
+  }
+  int dist_cm = time_elapsed_us * SPEED_OF_SOUND_CM_US / 2;
+  return dist_cm;
 }
