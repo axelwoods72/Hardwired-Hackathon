@@ -19,4 +19,16 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     FoodFinder.init();
+
+    window.ws?.addEventListener("message", (event) => {
+        const msg = JSON.parse(event.data);
+        const panel = document.getElementById('food-finder-app');
+        if (!panel?.classList.contains('active')) return;
+
+        if (msg.type === "sel") {
+            FoodFinder.onKey('Enter');
+        } else if (msg.type === "stick" && NAV_KEYS.includes(msg.direction)) {
+            FoodFinder.onKey(msg.direction);
+        }
+    });
 });
