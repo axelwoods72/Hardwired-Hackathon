@@ -24,7 +24,7 @@ html, body {
     padding-right: 25px;
     padding-bottom: env(safe-area-inset-bottom);
 
-        opacity: 1;
+    opacity: 1;
     visibility: visible;
     transition: opacity 0.6s ease, visibility 0s linear 0s;
 }
@@ -492,6 +492,7 @@ body.asleep {
 .option-card.selected .opt-icon {
     transform: scale(1.2);
 }
+
 /* ---------- weather app ---------- */
 
 #weather-app {
