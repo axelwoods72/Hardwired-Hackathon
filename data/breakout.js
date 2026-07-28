@@ -190,8 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (pointInBtn(clickX, clickY, exitBtn)) {
       resetGame();
       document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
-      document.getElementById('clock-app').classList.add('active');
-      document.getElementById('active-app-title').textContent = 'Clock';
+      document.getElementById('game-select-app').classList.add('active');
+      document.getElementById('active-app-title').textContent = 'Game';
     }
   });
 });

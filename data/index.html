@@ -16,6 +16,8 @@
         <script src="foodfinder.js" defer></script>
         <script src="app.js" defer></script>
         <script src="breakout.js" defer></script>
+        <script src="runner.js" defer></script>
+        <script src="gameselect.js" defer></script>
         <link rel="stylesheet" href="style.css">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -105,10 +107,53 @@
                 <script src="weather.js"></script>
             </div>
 
+            <div id="game-select-app">
+                <div class="game-select-options">
+                    <div class="parallelogram select-option selected" data-target="game-app">
+                        <span>Brick Breaker</span>
+                    </div>
+                    <div class="parallelogram select-option" data-target="runner-app">
+                        <span>Alien Invasion</span>
+                    </div>
+                </div>
+                <div class="game-select-preview">
+                    <div class="preview-graphic" id="preview-breakout">
+                        <div class="preview-bricks">
+                            <span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="preview-paddle"></div>
+                        <div class="preview-ball"></div>
+                    </div>
+                    <div class="preview-graphic" id="preview-runner" style="display:none;">
+                        <div class="preview-runner-sky"></div>
+                        <div class="preview-star" style="top:14px; left:20px;"></div>
+                        <div class="preview-star" style="top:30px; left:60px;"></div>
+                        <div class="preview-star" style="top:50px; left:150px;"></div>
+                        <div class="preview-star" style="top:20px; left:130px;"></div>
+                        <div class="preview-star" style="top:60px; left:40px;"></div>
+                        <div class="preview-moon"></div>
+                        <div class="preview-alien-body"></div>
+                        <div class="preview-alien-head">
+                            <div class="preview-alien-eye left"></div>
+                            <div class="preview-alien-eye right"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hint-bar">&#8597; move &nbsp;&nbsp; [a] select</div>
+            </div>
+
             <div id="game-app">
                 <div class="game-wrapper">
                     <canvas id="breakout-canvas" width="360" height="500"></canvas>
                     <div id="game-score">SCORE: <span id="score-value">0</span></div>
+                </div>
+            </div>
+
+            <div id="runner-app">
+                <div class="game-wrapper">
+                    <canvas id="runner-canvas" width="900" height="320"></canvas>
                 </div>
             </div>
         </div>
