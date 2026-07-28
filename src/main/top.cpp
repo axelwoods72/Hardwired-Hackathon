@@ -153,6 +153,7 @@ void loop()
   handleNavButton();
   handleSelButton();
   handleJoyStick();
+  handleUltrasonic();
 }
 
 /**********************************************************************/
@@ -204,6 +205,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     {
       isAsleep = true;
       sleepLEDs();
+      sleepArms();
     }
   }
 }
