@@ -23,6 +23,16 @@ html, body {
     padding-left: 10px;
     padding-right: 25px;
     padding-bottom: env(safe-area-inset-bottom);
+
+        opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s ease, visibility 0s linear 0s;
+}
+
+body.asleep {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0s linear 0s;
 }
 
 
@@ -472,7 +482,6 @@ html, body {
 .detail-stars { color: #c9b608; font-size: 12px; }
 .remove-row .detail-label { color: #d33; }
 
-<<<<<<< HEAD:src/style.css
 .opt-icon {
     font-size: 2.5rem;
     line-height: 1;
@@ -482,8 +491,7 @@ html, body {
 
 .option-card.selected .opt-icon {
     transform: scale(1.2);
-=======
-
+}
 /* ---------- weather app ---------- */
 
 #weather-app {
@@ -564,5 +572,4 @@ html, body {
 .forecast-high-temp,
 .forecast-low-temp {
     white-space: nowrap;
->>>>>>> e8c2eba079b6b676307d0fcabdcbce9c3f4893a2:data/style.css
 }
