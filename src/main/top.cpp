@@ -5,6 +5,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <Arduino_JSON.h>
+#include <ESP32Servo.h>
 
 #include "config.h"
 
@@ -29,6 +30,9 @@
 // Ultrasonic pins
 #define TRIG_PIN 32
 #define ECHO_PIN 15
+// Servos
+#define SERVO_L_PIN 1
+#define SERVO_R_PIN 3
 // Misc.
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define STICK_DEADBAND 1500
@@ -46,8 +50,11 @@ void handleNavButton();
 void handleSelButton();
 void handleJoyStick();
 void handleUltrasonic();
+void update_app(JSONVar msg);
 void celebrate();
 void KnightRiderLEDs();
+void sleepLEDs();
+void wakeLEDs();
 void save_food(JSONVar msg);
 int calibrateStick(int pin);
 int find_dist_cm();
@@ -75,6 +82,9 @@ unsigned long lastWaveTime = 0;
 bool wasClose = false;
 
 bool isAsleep = false;
+
+Servo leftArm;
+Servo rightArm;
 
 /**********************************************************************/
 
@@ -128,6 +138,8 @@ void setup()
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
+  leftArm.attach(SERVO_L_PIN);
+  rightArm.attach(SERVO_R_PIN);
 
   // Calibrate joystick
   delay(500);
@@ -297,11 +309,13 @@ void handleUltrasonic()
     if (isAsleep)
     {
       wakeLEDs();
+      wakeArms();
       isAsleep = false;
     }
     else
     {
       sleepLEDs();
+      sleepArms();
       isAsleep = true;
     }
     lastWaveTime = millis();
@@ -315,6 +329,7 @@ void celebrate()
 {
   // tweak out
   KnightRiderLEDs();
+  celebrateArms();
 }
 
 void save_food(JSONVar msg)
@@ -414,6 +429,62 @@ void wakeLEDs()
     delay(stepDelay);
     stepDelay -= 70; // speed up each step
   }
+}
+
+/**********************************************************************/
+/* Servo sequences */
+
+void celebrateArms()
+{
+  // pump arms
+  for (int i = 0; i < 4; i++)
+  {
+    leftArm.write(180);
+    rightArm.write(0);
+    delay(300);
+    leftArm.write(0);
+    rightArm.write(180);
+    delay(300);
+  }
+  leftArm.write(90);
+  rightArm.write(90);
+}
+
+void sleepArms()
+{
+  // Slow droop
+  int stepDelay = 150;
+  for (int angle = 180; angle >= 0; angle -= 30)
+  {
+    leftArm.write(angle);
+    rightArm.write(angle);
+    delay(stepDelay);
+    stepDelay += 80;
+  }
+}
+
+void wakeArms()
+{
+  // stretch up
+  for (int angle = 0; angle <= 180; angle += 20)
+  {
+    leftArm.write(angle);
+    rightArm.write(angle);
+    delay(150);
+  }
+  // bounce at the top
+  for (int i = 0; i < 2; i++)
+  {
+    leftArm.write(160);
+    rightArm.write(160);
+    delay(100);
+    leftArm.write(180);
+    rightArm.write(180);
+    delay(100);
+  }
+
+  leftArm.write(90);
+  rightArm.write(90);
 }
 
 /**********************************************************************/
