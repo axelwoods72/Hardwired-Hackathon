@@ -97,7 +97,6 @@ function cycle_app() {
     if (window.ws?.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "update_app", app: app_cycle[cur_app] }));
     }
-<<<<<<< HEAD
     msg_obj["app"] = app_cycle[cur_app];
     ws.send(JSON.stringify(msg_obj));
 }
@@ -119,6 +118,4 @@ function reset_app_cycle() {
 
     const top_time_display = document.getElementById("clock-hm");
     top_time_display.classList.toggle("hide", cur_app == 0);
-=======
->>>>>>> 38139db (radar done for food finder)
 }

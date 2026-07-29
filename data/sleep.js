@@ -1,4 +1,4 @@
-const SLEEP_DELAY = 10000; // one minute
+const SLEEP_DELAY = 30000; // 30 seconds
 let sleepTimer;
 
 document.addEventListener('DOMContentLoaded', () => {
