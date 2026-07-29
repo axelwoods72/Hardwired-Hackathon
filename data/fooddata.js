@@ -11,16 +11,9 @@ const MELBOURNE_CBD = { lat: -37.8136, lng: 144.9631 };
 // adds to the search and the id of the next node (null = quiz over, go fight).
 // The `type` values are real Google Places API type strings, so stage 5 can
 // pass them straight through.
+// Round 1 (radius) is chosen on the radar screen before the quiz starts, so the
+// quiz itself begins at cuisine. The radar injects `radius` into the search.
 const QUIZ = {
-    start: {
-        round: 1,
-        question: 'How hungry are you?',
-        options: [
-            { label: 'Peckish',  caption: 'quick bite',   filters: { radius: 600 },  next: 'cuisine' },
-            { label: 'Hungry',   caption: 'proper meal',  filters: { radius: 1200 }, next: 'cuisine' },
-            { label: 'Starving', caption: 'no limits',    filters: { radius: 2500 }, next: 'cuisine' },
-        ],
-    },
     cuisine: {
         round: 2,
         question: 'Choose your fighter',
@@ -47,7 +40,7 @@ const QUIZ = {
     },
 };
 
-const QUIZ_START_NODE = 'start';
+const QUIZ_START_NODE = 'cuisine';
 
 // Mock data: real, well-known Melbourne CBD spots so the demo feels genuine.
 // Coordinates are approximate; ratings/prices indicative. Replaced by live
@@ -117,19 +110,26 @@ async function getSearchCenter() {
 // honest straight-line distances.
 async function searchRestaurants(filters) {
     const center = await getSearchCenter();
+    // Radar sends strict:true — the player picked this radius on purpose, so we
+    // honour it exactly and never silently widen. An empty result is honest
+    // ("no signals on radar") rather than a place 6km outside the scan.
+    const strict = filters.strict === true;
     try {
-        const attempts = [
-            ...[...new Set([filters.radius ?? 1200, 2500, 6000])].map(radius => ({ ...filters, radius })),
-            { ...filters, radius: 6000, maxPrice: 4 },    // last rung: drop the budget cap
-        ];
+        const attempts = strict
+            ? [filters]
+            : [
+                ...[...new Set([filters.radius ?? 1200, 2500, 6000])].map(radius => ({ ...filters, radius })),
+                { ...filters, radius: 6000, maxPrice: 4 },    // last rung: drop the budget cap
+            ];
         for (const attempt of attempts) {
             const found = await searchGooglePlaces(attempt, center);
             if (found.length) return found;
         }
-        return searchMockPlaces({ type: filters.type, radius: Infinity }, center);
+        return strict ? [] : searchMockPlaces({ type: filters.type, radius: Infinity }, center);
     } catch (err) {
         console.warn('Google Places unavailable — using mock data.', err);
         const mock = searchMockPlaces(filters, center);
+        if (strict) return mock;    // respect the chosen radius even on the fallback
         return mock.length ? mock : searchMockPlaces({ type: filters.type, radius: Infinity }, center);
     }
 }

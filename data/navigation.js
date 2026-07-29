@@ -20,6 +20,18 @@ function onLoad() {
     top_time_display.classList.toggle("hide", cur_app == 0);
 
     switchSound.volume = 0.2;
+
+    // Browser testing (no ESP32): Tab cycles apps; click a menu icon to jump.
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            cycle_app();
+        }
+    });
+    document.querySelectorAll('.app-box').forEach((box, i) => {
+        box.style.cursor = 'pointer';
+        box.addEventListener('click', () => jump_to_app(i));
+    });
 }
 
 function initWebSocket() {
@@ -45,9 +57,16 @@ function initWebSocket() {
     });
 }
 
+function jump_to_app(index) {
+    if (index === cur_app || index < 0 || index >= app_cycle.length) return;
+    // Walk cycle_app so LED / onShow side-effects stay consistent.
+    const steps = (index - cur_app + app_cycle.length) % app_cycle.length;
+    for (let n = 0; n < steps; n++) cycle_app();
+}
+
 function cycle_app() {
     switchSound.currentTime = 0;
-    switchSound.play();
+    switchSound.play().catch(() => {});
 
     // deactivate old app
     var cur_app_element = document.getElementById(app_cycle[cur_app]);
@@ -74,10 +93,11 @@ function cycle_app() {
         FoodFinder.onShow?.();
     }
 
-    // send msg to esp32 to change LED color
-    const msg_obj = {
-        type: "update_app"
+    // send msg to esp32 to change LED color (skip when testing in browser)
+    if (window.ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "update_app", app: app_cycle[cur_app] }));
     }
+<<<<<<< HEAD
     msg_obj["app"] = app_cycle[cur_app];
     ws.send(JSON.stringify(msg_obj));
 }
@@ -99,4 +119,6 @@ function reset_app_cycle() {
 
     const top_time_display = document.getElementById("clock-hm");
     top_time_display.classList.toggle("hide", cur_app == 0);
+=======
+>>>>>>> 38139db (radar done for food finder)
 }

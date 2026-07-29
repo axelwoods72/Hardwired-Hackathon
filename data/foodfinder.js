@@ -15,7 +15,7 @@ const FoodFinder = (() => {
     const SAVED_KEY = 'savedRestaurants';
 
     let root = null;
-    let screen = 'menu';       // menu | quiz | vs | results | winner | exit | saved | detail
+    let screen = 'menu';       // menu | radar | quiz | vs | results | winner | exit | saved | detail
     let sel = 0;               // highlighted index on list/grid screens
     let nodeId = QUIZ_START_NODE;
     let path = [];             // answers so far: [{ nodeId, optionIndex }]
@@ -24,6 +24,13 @@ const FoodFinder = (() => {
     let savedIndex = 0;        // which saved restaurant the detail screen edits
     let detailRow = 0;         // detail screen focus: 0 = rating, 1 = remove
     let searchToken = 0;       // ignores stale search results after cancel
+
+    // ---- radar (round 1: scan radius) ----
+    // Tiered stops so the joystick sweeps 250m..20km in a few clicks instead of
+    // ~80. up/down steps through these; the chosen metres feed the search.
+    const RADAR_STOPS = [250, 500, 1000, 2000, 3000, 5000, 10000, 20000];
+    let radarIndex = 2;        // starts at 1km
+    const radarRadius = () => RADAR_STOPS[radarIndex];
 
     // ---- saved restaurants (localStorage) ----
     // Each saved record is a place object plus myRating (0 = not rated yet).
@@ -70,7 +77,7 @@ const FoodFinder = (() => {
         setScreen('vs');
         const token = ++searchToken;
         const [found] = await Promise.all([
-            searchRestaurants(mergedFilters()),
+            searchRestaurants({ ...mergedFilters(), radius: radarRadius(), strict: true }),
             new Promise(r => setTimeout(r, 900)),    // vs screen lands its punch
         ]);
         if (token !== searchToken || screen !== 'vs') return;
@@ -102,7 +109,7 @@ const FoodFinder = (() => {
 
     function onKey(key) {
         const handlers = {
-            menu: menuKey, quiz: quizKey, vs: vsKey,
+            menu: menuKey, radar: radarKey, quiz: quizKey, vs: vsKey,
             results: resultsKey, winner: winnerKey, exit: exitKey, saved: savedKey, detail: detailKey,
         };
         handlers[screen]?.(key);
@@ -110,10 +117,20 @@ const FoodFinder = (() => {
 
     function menuKey(key) {
         if (key === 'Enter') {
-            if (sel === 0) startQuiz(); else setScreen('saved');
+            if (sel === 0) setScreen('radar'); else setScreen('saved');   // find restaurant starts at the radar
             return;
         }
         moveList(key, 2);
+        render();
+    }
+
+    // Radar (round 1): up/down dials the scan radius, [a] launches the quiz with
+    // that radius locked in, [b] backs out to the menu.
+    function radarKey(key) {
+        if (key === 'Escape') { setScreen('menu', 0); return; }
+        if (key === 'Enter') { startQuiz(); return; }
+        if (key === 'ArrowUp' && radarIndex < RADAR_STOPS.length - 1) radarIndex++;
+        if (key === 'ArrowDown' && radarIndex > 0) radarIndex--;
         render();
     }
 
@@ -241,7 +258,7 @@ const FoodFinder = (() => {
 
     function render() {
         const screens = {
-            menu: renderMenu, quiz: renderQuiz, vs: renderVS,
+            menu: renderMenu, radar: renderRadar, quiz: renderQuiz, vs: renderVS,
             results: renderResults, winner: renderWinner, exit: renderExit, saved: renderSaved, detail: renderDetail,
         };
         root.innerHTML = screens[screen]();
@@ -259,6 +276,29 @@ const FoodFinder = (() => {
         ).join('')}
             </div>
             ${hintBar('&#8597; move &nbsp;&nbsp; [a] select')}
+        </div>`;
+    }
+
+    // Round 1: the arcade radar. A fixed grid with one bright ring that grows as
+    // you dial the radius up; a sweep line spins over the top for the arcade feel.
+    function renderRadar() {
+        const pct = radarIndex / (RADAR_STOPS.length - 1);
+        const ring = (15 + pct * 135).toFixed(1);   // active ring radius, svg units
+        return `<div class="ff-screen radar-screen">
+            <div class="round-banner">round 1</div>
+            <div class="question">set your scan range</div>
+            <div class="radar-shell">
+                <svg viewBox="0 0 320 320" class="radar-svg" aria-hidden="true">
+                    <circle cx="160" cy="160" r="150" class="radar-grid"/>
+                    <circle cx="160" cy="160" r="100" class="radar-grid"/>
+                    <circle cx="160" cy="160" r="50"  class="radar-grid"/>
+                    <line   x1="160" y1="160" x2="160" y2="10" class="radar-sweep"/>
+                    <circle cx="160" cy="160" r="${ring}" class="radar-active"/>
+                    <circle cx="160" cy="160" r="5" class="radar-you"/>
+                </svg>
+            </div>
+            <div class="radar-value">${fmtDistance(radarRadius())} radius</div>
+            ${hintBar('&#8597; range &nbsp;&nbsp; [a] scan &nbsp;&nbsp; [b] back')}
         </div>`;
     }
 
@@ -310,8 +350,8 @@ const FoodFinder = (() => {
     function renderResults() {
         if (!results.length) {
             return `<div class="ff-screen">
-                <div class="question">no challengers found</div>
-                <div class="empty-note">try a bigger hunger or another cuisine</div>
+                <div class="question">no signals on radar</div>
+                <div class="empty-note">widen your scan range or pick another cuisine</div>
                 ${hintBar('[a] or [b] back')}
             </div>`;
         }
