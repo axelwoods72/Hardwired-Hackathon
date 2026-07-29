@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
             FoodFinder.onKey('Enter');
         } else if (msg.type === "stick" && NAV_KEYS.includes(msg.direction)) {
             FoodFinder.onKey(msg.direction);
+        } else if (msg.type === "sw") {
+            FoodFinder.onKey('Escape');
         }
     });
 });

@@ -1,2 +1,2 @@
-#define WIFI_SSID "Telstra0316"
-#define WIFI_PASSWORD "5334788559"
+#define WIFI_SSID "Backup iPhone"
+#define WIFI_PASSWORD "liverpool"

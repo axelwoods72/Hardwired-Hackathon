@@ -13,32 +13,34 @@
 /* Defines */
 
 // LED pins
-#define LED_DATA_PIN 6
-#define LED_CLOCK_PIN 2
-#define LED_LATCH_PIN 4
+#define LED_DATA_PIN 25
+#define LED_CLOCK_PIN 32
+#define LED_LATCH_PIN 33
 // Button pins
-#define NAV_BUTTON_PIN 35
-#define SEL_BUTTON_PIN 37
+#define NAV_BUTTON_PIN 5
+#define SEL_BUTTON_PIN 18
 // Joystick pins
-#define VRX_PIN 8
-#define VRY_PIN 10
-#define SW_PIN 33
+#define VRX_PIN 36
+#define VRY_PIN 39
+#define SW_PIN 34
 // RGB pins
 #define RED_PIN 12
 #define GREEN_PIN 14
 #define BLUE_PIN 27
 // Ultrasonic pins
-#define TRIG_PIN 32
+#define TRIG_PIN 26
 #define ECHO_PIN 15
 // Servos
-#define SERVO_L_PIN 1
-#define SERVO_R_PIN 3
+#define SERVO_L_PIN 19
+#define SERVO_R_PIN 21
 // Misc.
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define STICK_DEADBAND 1500
 #define WAVE_DIST_THRESHOLD_CM 15
 #define WAVE_COOLDOWN_MS 1000
 #define SPEED_OF_SOUND_CM_US 0.0343
+// on/off LED
+#define ON_OFF_PIN 13
 
 /**********************************************************************/
 /* Function prototypes */
@@ -55,6 +57,9 @@ void celebrate();
 void KnightRiderLEDs();
 void sleepLEDs();
 void wakeLEDs();
+void celebrateArms();
+void wakeArms();
+void sleepArms();
 void save_food(JSONVar msg);
 int calibrateStick(int pin);
 int find_dist_cm();
@@ -138,6 +143,7 @@ void setup()
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
+  pinMode(ON_OFF_PIN, OUTPUT);
   leftArm.attach(SERVO_L_PIN);
   rightArm.attach(SERVO_R_PIN);
 
@@ -301,7 +307,7 @@ void handleJoyStick()
 void handleUltrasonic()
 {
   int dist_cm = find_dist_cm();
-  bool isClose = (dist_cm && dist_cm < WAVE_DIST_THRESHOLD_CM);
+  bool isClose = (dist_cm > 0 && dist_cm < WAVE_DIST_THRESHOLD_CM);
   if (isClose && !wasClose && (millis() - lastWaveTime > WAVE_COOLDOWN_MS))
   {
     Serial.println("Hand wave detected - toggle sleep");
@@ -400,6 +406,7 @@ void sleepLEDs()
   byte pattern = 0b11111111;
   updateLEDs(pattern);
   delay(150);
+  digitalWrite(ON_OFF_PIN, LOW);
 
   // Converging inwards
   int pairs[4][2] = {{0, 7}, {1, 6}, {2, 5}, {3, 4}};
@@ -419,6 +426,7 @@ void wakeLEDs()
   byte pattern = 0b00000000; // all off
   updateLEDs(pattern);
   delay(300);
+  digitalWrite(ON_OFF_PIN, HIGH);
 
   // Diverging Outwards
   int pairs[4][2] = {{3, 4}, {2, 5}, {1, 6}, {0, 7}};
