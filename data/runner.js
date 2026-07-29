@@ -121,6 +121,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('keydown', (e) => {
+    if (gameOver || won) {
+      if (e.key === 'Enter') resetGame();
+      if (e.key === 'Escape') {
+        resetGame();
+        document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
+        document.getElementById('game-select-app').classList.add('active');
+        document.getElementById('active-app-title').textContent = 'Game';
+      }
+      return;
+    }
+
     if (e.key === 'ArrowUp') { e.preventDefault(); jump(); }
     if (e.key === 'ArrowDown') { e.preventDefault(); shoot(); }
 
@@ -135,6 +146,18 @@ document.addEventListener('DOMContentLoaded', () => {
   window.ws?.addEventListener("message", (event) => {
     if (!runnerAppEl.classList.contains('active')) return;
     const msg = JSON.parse(event.data);
+
+    if (gameOver || won) {
+      if (msg.type === "sel") resetGame();
+      if (msg.type === "sw") {
+        resetGame();
+        document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
+        document.getElementById('game-select-app').classList.add('active');
+        document.getElementById('active-app-title').textContent = 'Game';
+      }
+      return;
+    }
+
     if (msg.type === "stick" && msg.direction === "ArrowUp") jump();
     if (msg.type === "stick" && msg.direction === "ArrowDown") shoot();
   });

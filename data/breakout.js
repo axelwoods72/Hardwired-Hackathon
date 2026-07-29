@@ -33,6 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const keys = { left: false, right: false };
 
   document.addEventListener('keydown', (e) => {
+    if (gameOver || won) {
+      if (e.key === 'Enter') resetGame();
+      if (e.key === 'Escape') {
+        resetGame();
+        document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
+        document.getElementById('game-select-app').classList.add('active');
+        document.getElementById('active-app-title').textContent = 'Game';
+      }
+      return;
+    }
+
     if (e.key === 'ArrowLeft')  keys.left = true;
     if (e.key === 'ArrowRight') keys.right = true;
 
@@ -51,6 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
   window.ws?.addEventListener("message", (event) => {
     if (!gameAppEl.classList.contains('active')) return;
     const msg = JSON.parse(event.data);
+
+    if (gameOver || won) {
+      if (msg.type === "sel") resetGame();
+      if (msg.type === "sw") {
+        resetGame();
+        document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
+        document.getElementById('game-select-app').classList.add('active');
+        document.getElementById('active-app-title').textContent = 'Game';
+      }
+      return;
+    }
+
     if (msg.type === "stick" && msg.direction === "ArrowLeft")  paddle.x -= 30;
     if (msg.type === "stick" && msg.direction === "ArrowRight") paddle.x += 30;
   });
