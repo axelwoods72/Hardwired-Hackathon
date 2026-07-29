@@ -20,12 +20,6 @@ function onLoad() {
     top_time_display.classList.toggle("hide", cur_app == 0);
 
     switchSound.volume = 0.2;
-
-    // TEMP: tap any header icon to cycle tiles for phone testing
-    // (real navigation happens via ESP32 "nav" WebSocket message — remove once hardware works)
-    document.querySelectorAll('.app-box').forEach(box => {
-        box.addEventListener('click', cycle_app);
-    });
 }
 
 function initWebSocket() {
@@ -41,6 +35,8 @@ function initWebSocket() {
         console.log("Message from ESP32 Server: ", event.data);
         if (msg.type === "nav") {
             cycle_app();
+        } else if (msg.type === "reset") {
+            reset_app_cycle();
         }
     });
 
@@ -84,4 +80,23 @@ function cycle_app() {
     }
     msg_obj["app"] = app_cycle[cur_app];
     ws.send(JSON.stringify(msg_obj));
+}
+
+function reset_app_cycle() {
+    cur_app = 0;
+
+    const menu_boxes = document.querySelectorAll(".app-box");
+    menu_boxes.forEach((box, i) => {
+        box.classList.toggle("current", i === cur_app);
+    });
+
+    for (let i = 1; i < app_cycle.length; i++) {
+        const app = document.getElementById(app_cycle[i]);
+        app.classList.remove("active");
+    }
+    const app = document.getElementById(app_cycle[cur_app]);
+    app.classList.add("active");
+
+    const top_time_display = document.getElementById("clock-hm");
+    top_time_display.classList.toggle("hide", cur_app == 0);
 }

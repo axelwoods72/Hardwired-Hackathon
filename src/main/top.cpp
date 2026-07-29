@@ -180,9 +180,14 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   switch (type)
   {
   case WS_EVT_CONNECT:
+  {
+    JSONVar msg;
+    msg["Type"] = "reset";
+    ws.textAll(JSON.stringify(msg));
     client_connected = true;
     Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     break;
+  }
   case WS_EVT_DISCONNECT:
     client_connected = false;
     Serial.printf("WebSocket client #%u disconnected\n", client->id());
