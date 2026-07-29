@@ -35,7 +35,7 @@
 #define SERVO_R_PIN 21
 // Misc.
 #define FORMAT_LITTLEFS_IF_FAILED true
-#define STICK_DEADBAND 1500
+#define STICK_DEADBAND 1200
 #define WAVE_DIST_THRESHOLD_CM 15
 #define WAVE_COOLDOWN_MS 1000
 #define SPEED_OF_SOUND_CM_US 0.0343
@@ -291,11 +291,11 @@ void handleJoyStick()
   {
     if (abs(delta_x) > abs(delta_y))
     {
-      stickDirection = delta_x > 0 ? "ArrowRight" : "ArrowLeft";
+      stickDirection = delta_x > 0 ? "ArrowLeft" : "ArrowRight";
     }
     else
     {
-      stickDirection = delta_y > 0 ? "ArrowUp" : "ArrowDown";
+      stickDirection = delta_y > 0 ? "ArrowDown" : "ArrowUp";
     }
   }
 
@@ -342,20 +342,14 @@ void handleUltrasonic()
   if (isClose && !wasClose && (millis() - lastWaveTime > WAVE_COOLDOWN_MS))
   {
     Serial.println("Hand wave detected - toggle sleep");
-    JSONVar obj;
-    obj["type"] = "sleep";
-    ws.textAll(JSON.stringify(obj));
     if (isAsleep)
     {
       wakeLEDs();
       wakeArms();
       isAsleep = false;
-    }
-    else
-    {
-      sleepLEDs();
-      sleepArms();
-      isAsleep = true;
+      JSONVar obj;
+      obj["type"] = "sleep";
+      ws.textAll(JSON.stringify(obj));
     }
     lastWaveTime = millis();
   }
