@@ -158,6 +158,11 @@ void setup()
   delay(500);
   xCentre = calibrateStick(VRX_PIN);
   yCentre = calibrateStick(VRY_PIN);
+
+  // Initial RGB state
+  analogWrite(RED_PIN, 255);
+  analogWrite(GREEN_PIN, 255);
+  analogWrite(BLUE_PIN, 0);
 }
 
 void loop()
@@ -182,7 +187,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   case WS_EVT_CONNECT:
   {
     JSONVar msg;
-    msg["Type"] = "reset";
+    msg["type"] = "reset";
     ws.textAll(JSON.stringify(msg));
     client_connected = true;
     Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
@@ -190,6 +195,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   }
   case WS_EVT_DISCONNECT:
     client_connected = false;
+    isAsleep = true;
     Serial.printf("WebSocket client #%u disconnected\n", client->id());
     break;
   case WS_EVT_DATA:
