@@ -51,6 +51,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
 void handleNavButton();
 void handleSelButton();
 void handleJoyStick();
+void handleSwButton();
 void handleUltrasonic();
 void update_app(JSONVar msg);
 void celebrate();
@@ -77,6 +78,10 @@ unsigned long last_nav_change = 0;
 int sel_button_prev = HIGH;
 int debounced_sel_curr = HIGH;
 unsigned long last_sel_change = 0;
+
+int sw_prev = HIGH;
+int debounced_sw_curr = HIGH;
+unsigned long last_sw_change = 0;
 const unsigned short debounceDelay = 50;
 
 int xCentre = 4000;
@@ -158,6 +163,7 @@ void loop()
   // Inputs
   handleNavButton();
   handleSelButton();
+  handleSwButton();
   handleJoyStick();
   handleUltrasonic();
 }
@@ -302,6 +308,31 @@ void handleJoyStick()
     ws.textAll(JSON.stringify(obj));
   }
   lastStickDirection = stickDirection;
+}
+
+void handleSwButton()
+{
+  int sw_curr = digitalRead(SW_PIN);
+  if (sw_curr != sw_prev)
+  {
+    last_sw_change = millis();
+  }
+
+  if ((millis() - last_sw_change) > debounceDelay)
+  {
+    if (sw_curr != debounced_sw_curr)
+    {
+      debounced_sw_curr = sw_curr;
+      if (debounced_sw_curr == LOW)
+      {
+        Serial.println("SW pressed - escape");
+        JSONVar obj;
+        obj["type"] = "sw";
+        ws.textAll(JSON.stringify(obj));
+      }
+    }
+  }
+  sw_prev = sw_curr;
 }
 
 void handleUltrasonic()
