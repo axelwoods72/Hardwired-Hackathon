@@ -1,4 +1,4 @@
-const SLEEP_DELAY = 60000; // one minute
+const SLEEP_DELAY = 10000; // one minute
 let sleepTimer;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const msg = JSON.parse(event.data);
         if (msg.type === "sleep" && document.getElementById("sleep-overlay").classList.contains("asleep")) {
             goAwake();
+        } else if (msg.type === "reset") {
+            goSleep();
         }
     });
 });

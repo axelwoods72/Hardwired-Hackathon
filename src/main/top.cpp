@@ -22,7 +22,7 @@
 // Joystick pins
 #define VRX_PIN 36
 #define VRY_PIN 39
-#define SW_PIN 34
+#define SW_PIN 4
 // RGB pins
 #define RED_PIN 12
 #define GREEN_PIN 14
@@ -91,7 +91,9 @@ String lastStickDirection = "none";
 unsigned long lastWaveTime = 0;
 bool wasClose = false;
 
-bool isAsleep = false;
+bool isAsleep = true;
+
+bool client_connected = false;
 
 Servo leftArm;
 Servo rightArm;
@@ -160,12 +162,15 @@ void setup()
 
 void loop()
 {
-  // Inputs
-  handleNavButton();
-  handleSelButton();
-  handleSwButton();
-  handleJoyStick();
-  handleUltrasonic();
+  if (client_connected)
+  {
+    // Inputs
+    handleNavButton();
+    handleSelButton();
+    handleSwButton();
+    handleJoyStick();
+    handleUltrasonic();
+  }
 }
 
 /**********************************************************************/
@@ -175,9 +180,11 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   switch (type)
   {
   case WS_EVT_CONNECT:
+    client_connected = true;
     Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     break;
   case WS_EVT_DISCONNECT:
+    client_connected = false;
     Serial.printf("WebSocket client #%u disconnected\n", client->id());
     break;
   case WS_EVT_DATA:
@@ -215,6 +222,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     }
     else if (type == "sleep")
     {
+      Serial.println("Going to sleep");
       isAsleep = true;
       sleepLEDs();
       sleepArms();
@@ -344,6 +352,7 @@ void handleUltrasonic()
     Serial.println("Hand wave detected - toggle sleep");
     if (isAsleep)
     {
+      Serial.println("Hand wave detected - Waking up");
       wakeLEDs();
       wakeArms();
       isAsleep = false;

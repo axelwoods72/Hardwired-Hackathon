@@ -1,8 +1,35 @@
 #include <Arduino.h>
 
-#define VRX_PIN 8
-#define VRY_PIN 10
-#define SW_PIN 34
+#define VRX_PIN 36
+#define VRY_PIN 39
+#define SW_PIN 4
+
+int sw_prev = HIGH;
+int debounced_sw_curr = HIGH;
+unsigned long last_sw_change = 0;
+const unsigned short debounceDelay = 50;
+
+void handleSwButton()
+{
+    int sw_curr = digitalRead(SW_PIN);
+    if (sw_curr != sw_prev)
+    {
+        last_sw_change = millis();
+    }
+
+    if ((millis() - last_sw_change) > debounceDelay)
+    {
+        if (sw_curr != debounced_sw_curr)
+        {
+            debounced_sw_curr = sw_curr;
+            if (debounced_sw_curr == LOW)
+            {
+                Serial.println("SW pressed - escape");
+            }
+        }
+    }
+    sw_prev = sw_curr;
+}
 
 void setup()
 {
@@ -24,4 +51,6 @@ void loop()
     Serial.println(swVal);
 
     delay(100);
+
+    handleSwButton();
 }
