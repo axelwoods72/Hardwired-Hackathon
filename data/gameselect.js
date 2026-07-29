@@ -27,6 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter')     { launch(sel); }
   });
 
+  window.ws?.addEventListener("message", (event) => {
+    if (!selectAppEl.classList.contains('active')) return;
+    const msg = JSON.parse(event.data);
+    if (msg.type === "stick") {
+      if (msg.direction === "ArrowUp")   { sel = Math.max(0, sel - 1); updateSelection(); }
+      if (msg.direction === "ArrowDown") { sel = Math.min(options.length - 1, sel + 1); updateSelection(); }
+    } else if (msg.type === "sel") {
+      launch(sel);
+    }
+  });
+
   options.forEach((opt, i) => {
     opt.addEventListener('click', () => {
       sel = i;

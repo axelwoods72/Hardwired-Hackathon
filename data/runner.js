@@ -132,6 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  window.ws?.addEventListener("message", (event) => {
+    if (!runnerAppEl.classList.contains('active')) return;
+    const msg = JSON.parse(event.data);
+    if (msg.type === "stick" && msg.direction === "ArrowUp") jump();
+    if (msg.type === "stick" && msg.direction === "ArrowDown") shoot();
+  });
+
   function spawnObstacle() {
     const h = 30 + Math.random() * 20;
     obstacles.push({ x: canvas.width + 20, y: groundY - h, w: 20, h });

@@ -48,6 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'ArrowRight') keys.right = false;
   });
 
+  window.ws?.addEventListener("message", (event) => {
+    if (!gameAppEl.classList.contains('active')) return;
+    const msg = JSON.parse(event.data);
+    if (msg.type === "stick" && msg.direction === "ArrowLeft")  paddle.x -= 30;
+    if (msg.type === "stick" && msg.direction === "ArrowRight") paddle.x += 30;
+  });
+
   function update() {
     if (keys.left)  paddle.x -= paddle.speed;
     if (keys.right) paddle.x += paddle.speed;
