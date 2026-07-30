@@ -1,16 +1,4 @@
-// Food finder: one small state machine. Each screen knows how to render itself
-// into #food-finder-app and what to do with the six input keys.
-//
-//   menu -> quiz -> vs (searching) -> results -> winner
-//     \-> saved -> detail (rate / remove)
-//
-// The flow's payoff: on the results screen the A button SELECTS a restaurant
-// (wins the battle). That auto-adds it to your saved fighters and shows a
-// WINNER screen. Later, in the saved list, you rate each place after eating.
-//
-// Data flows one way: a key press mutates state, then render() redraws the
-// whole panel from state, so the screen can never drift out of sync.
-
+// Food finder state machine
 const FoodFinder = (() => {
     const SAVED_KEY = 'savedRestaurants';
 
@@ -25,16 +13,12 @@ const FoodFinder = (() => {
     let detailRow = 0;         // detail screen focus: 0 = rating, 1 = remove
     let searchToken = 0;       // ignores stale search results after cancel
 
-    // ---- radar (round 1: scan radius) ----
-    // Tiered stops so the joystick sweeps 250m..20km in a few clicks instead of
-    // ~80. up/down steps through these; the chosen metres feed the search.
+    // round 1: scan radius
     const RADAR_STOPS = [250, 500, 1000, 2000, 3000, 5000, 10000, 20000];
     let radarIndex = 2;        // starts at 1km
     const radarRadius = () => RADAR_STOPS[radarIndex];
 
-    // ---- saved restaurants (localStorage) ----
-    // Each saved record is a place object plus myRating (0 = not rated yet).
-
+    // saved restaurants (localStorage)
     function getSaved() {
         try { return JSON.parse(localStorage.getItem(SAVED_KEY)) ?? []; }
         catch { return []; }
@@ -61,7 +45,7 @@ const FoodFinder = (() => {
         setSaved(saved);
     }
 
-    // ---- quiz walking ----
+    // quiz walking
 
     const currentNode = () => QUIZ[nodeId];
     const chosenOptions = () => path.map(p => QUIZ[p.nodeId].options[p.optionIndex]);
@@ -85,7 +69,7 @@ const FoodFinder = (() => {
         setScreen('results');
     }
 
-    // ---- shared state helpers ----
+    // state helpers
 
     function setScreen(next, index = 0) {
         screen = next;
@@ -105,7 +89,7 @@ const FoodFinder = (() => {
         if (next >= 0 && next < count) sel = next;
     }
 
-    // ---- input, per screen ----
+    // input
 
     function onKey(key) {
         const handlers = {
@@ -124,8 +108,6 @@ const FoodFinder = (() => {
         render();
     }
 
-    // Radar (round 1): up/down dials the scan radius, [a] launches the quiz with
-    // that radius locked in, [b] backs out to the menu.
     function radarKey(key) {
         if (key === 'Escape') { setScreen('menu', 0); return; }
         if (key === 'Enter') { startQuiz(); return; }
@@ -178,7 +160,7 @@ const FoodFinder = (() => {
         }
         if (key === 'Enter') {
             winnerPlace = results[sel];    // this fighter wins the battle
-            addSaved(winnerPlace);         // ...and joins your saved team
+            addSaved(winnerPlace);
             window.ws?.send(JSON.stringify({ type: "food_chosen" }));
             setScreen('winner');
             return;
@@ -188,16 +170,15 @@ const FoodFinder = (() => {
     }
 
     function winnerKey(key) {
-        if (key === 'Enter') setScreen('saved');   // A: go see your team
-        if (key === 'Escape') setScreen('exit');   // B: open the exit menu
+        if (key === 'Enter') setScreen('saved');   // go see your team
+        if (key === 'Escape') setScreen('exit');   // open the exit menu
     }
 
-    // Two choices: start over at the main menu, or go back to the challengers.
-    // Same navigation as every list screen: up/down to move, A to pick, B to cancel.
+    // start over at the main menu or go back to the challengers.
     function exitKey(key) {
-        if (key === 'Escape') { setScreen('winner'); return; }   // B: changed my mind
+        if (key === 'Escape') { setScreen('winner'); return; }   // changed my mind
         if (key === 'Enter') {
-            if (sel === 0) setScreen('menu');        // main menu (start over)
+            if (sel === 0) setScreen('menu');        // main menu
             else setScreen('results', 0);            // keep looking
             return;
         }
@@ -246,7 +227,7 @@ const FoodFinder = (() => {
         }
     }
 
-    // ---- rendering ----
+    // rendering
 
     const esc = s => String(s).replace(/[&<>"']/g,
         c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -275,12 +256,11 @@ const FoodFinder = (() => {
             `<div class="parallelogram ${i === sel ? 'selected' : ''}"><span>${label}</span></div>`
         ).join('')}
             </div>
-            ${hintBar('&#8597; move &nbsp;&nbsp; [a] select')}
+            ${hintBar('&#8597; move &nbsp;&nbsp; [left button] select')}
         </div>`;
     }
 
-    // Round 1: the arcade radar. A fixed grid with one bright ring that grows as
-    // you dial the radius up; a sweep line spins over the top for the arcade feel.
+    // the arcade radar
     function renderRadar() {
         const pct = radarIndex / (RADAR_STOPS.length - 1);
         const ring = (15 + pct * 135).toFixed(1);   // active ring radius, svg units
@@ -298,7 +278,7 @@ const FoodFinder = (() => {
                 </svg>
             </div>
             <div class="radar-value">${fmtDistance(radarRadius())} radius</div>
-            ${hintBar('&#8597; range &nbsp;&nbsp; [a] scan &nbsp;&nbsp; [b] back')}
+            ${hintBar('&#8597; range &nbsp;&nbsp; [left button] scan &nbsp;&nbsp; [press joystick] back')}
         </div>`;
     }
 
@@ -314,7 +294,7 @@ const FoodFinder = (() => {
                         <div class="opt-caption">${esc(o.caption)}</div>
                     </div>`).join('')}
             </div>
-            ${hintBar('&#8596;&#8597; move &nbsp;&nbsp; [a] select &nbsp;&nbsp; [b] back')}
+            ${hintBar('&#8596;&#8597; move &nbsp;&nbsp; [left button] select &nbsp;&nbsp; [press joystick] back')}
         </div>`;
     }
 
@@ -327,8 +307,8 @@ const FoodFinder = (() => {
         </div>`;
     }
 
-    // A place card. context 'results' shows an "in team" tag if already picked;
-    // context 'saved' shows your own rating below the stats.
+    // 'results' shows an "in team" tag if already picked
+    // 'saved' shows your own rating below the stats
     function placeCard(p, selected, context) {
         const tag = context === 'results' && isSaved(p.id)
             ? '<span class="rc-star">&#9733; in team</span>' : '';
@@ -352,7 +332,7 @@ const FoodFinder = (() => {
             return `<div class="ff-screen">
                 <div class="question">no signals on radar</div>
                 <div class="empty-note">widen your scan range or pick another cuisine</div>
-                ${hintBar('[a] or [b] back')}
+                ${hintBar('[left button] or [press joystick] back')}
             </div>`;
         }
         return `<div class="ff-screen list-screen">
@@ -360,7 +340,7 @@ const FoodFinder = (() => {
             <div class="card-list">
                 ${results.map((p, i) => placeCard(p, i === sel, 'results')).join('')}
             </div>
-            ${hintBar('&#8597; move &nbsp;&nbsp; [a] fight! &nbsp;&nbsp; [b] menu')}
+            ${hintBar('&#8597; move &nbsp;&nbsp; [left button] fight! &nbsp;&nbsp; [press joystick] menu')}
         </div>`;
     }
 
@@ -371,7 +351,7 @@ const FoodFinder = (() => {
             <div class="winner-name">${esc(p.name)}</div>
             <div class="winner-address">${esc(p.address)}</div>
             <div class="winner-saved">&#9733; added to your saved fighters</div>
-            ${hintBar('[a] saved list &nbsp;&nbsp; [b] exit')}
+            ${hintBar('[left button] saved list &nbsp;&nbsp; [press joystick] exit')}
         </div>`;
     }
 
@@ -384,7 +364,7 @@ const FoodFinder = (() => {
                     `<div class="parallelogram ${i === sel ? 'selected' : ''}"><span>${label}</span></div>`
                 ).join('')}
             </div>
-            ${hintBar('&#8597; move &nbsp;&nbsp; [a] select &nbsp;&nbsp; [b] back')}
+            ${hintBar('&#8597; move &nbsp;&nbsp; [left button] select &nbsp;&nbsp; [press joystick] back')}
         </div>`;
     }
 
@@ -394,7 +374,7 @@ const FoodFinder = (() => {
             return `<div class="ff-screen">
                 <div class="question">no saved fighters</div>
                 <div class="empty-note">pick a winner from the results screen</div>
-                ${hintBar('[b] back')}
+                ${hintBar('[press joystick] back')}
             </div>`;
         }
         return `<div class="ff-screen list-screen">
@@ -402,7 +382,7 @@ const FoodFinder = (() => {
             <div class="card-list">
                 ${saved.map((p, i) => placeCard(p, i === sel, 'saved')).join('')}
             </div>
-            ${hintBar('&#8597; move &nbsp;&nbsp; [a] open &nbsp;&nbsp; [b] menu')}
+            ${hintBar('&#8597; move &nbsp;&nbsp; [left button] open &nbsp;&nbsp; [press joystick] menu')}
         </div>`;
     }
 
@@ -420,11 +400,11 @@ const FoodFinder = (() => {
             <div class="detail-row remove-row ${detailRow === 1 ? 'selected' : ''}">
                 <span class="detail-label">remove fighter</span>
             </div>
-            ${hintBar('&#8597; row &nbsp; &#8596; rate &nbsp; [a] confirm &nbsp; [b] back')}
+            ${hintBar('&#8597; row &nbsp; &#8596; rate &nbsp; [left button] confirm &nbsp; [press joystick] back')}
         </div>`;
     }
 
-    // ---- public api (what AppShell sees) ----
+    // public API
 
     return {
         title: 'food finder',

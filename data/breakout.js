@@ -91,9 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ball.x < ball.r || ball.x > canvas.width - ball.r) ball.dx *= -1;
     if (ball.y < ball.r) ball.dy *= -1;
 
-    // paddle collision: full rectangle (top + sides), same axis-based
-    // approach as the brick collision — so a side clip bounces correctly
-    // instead of silently sliding past
+    // paddle collision: full rectangle (top + sides)
     const padLeft = paddle.x, padRight = paddle.x + paddle.w;
     const padTop = paddle.y, padBottom = paddle.y + paddle.h;
 
@@ -109,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.dx = hitPos * 4;
       }
     } else if (ball.dy > 0 && ball.y - ball.r > padBottom) {
-      // ball has fully passed below the paddle without ever touching it — instant miss
+      // ball has fully passed below the paddle without ever touching it
       gameOver = true;
       return;
     }
@@ -129,8 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         score += 10;
         scoreEl.textContent = score;
 
-        // bounce along whichever axis had the smaller overlap —
-        // that's the side the ball actually hit (top/bottom vs left/right)
+        // bounce along whichever axis had the smaller overlap 
         if (overlapX < overlapY) {
           ball.dx *= -1;
         } else {
@@ -140,11 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.dx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dx * SPEED_INCREMENT));
         ball.dy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, ball.dy * SPEED_INCREMENT));
 
-        break; // only one brick can break per frame — stops multi-brick tunneling
+        break; // only one brick can break per frame
       }
     }
 
-    // safety net, in case the ball somehow still gets past the line check
+    // if the ball somehow still gets past the line check
     if (ball.y > canvas.height + 20) gameOver = true;
     if (bricks.every(b => !b.alive)) won = true;
   }

@@ -1,18 +1,5 @@
-// Everything the food finder knows about food lives in this file:
-// the question flowchart the player walks through, and the restaurant search.
-//
-// searchRestaurants() serves mock Melbourne CBD data until the Google Places
-// API is wired in (stage 5). The mock branch stays forever as the offline
-// fallback so the demo survives dead venue wifi.
-
 const MELBOURNE_CBD = { lat: -37.8136, lng: 144.9631 };
 
-// The flowchart. Each node is a question; each option carries the filters it
-// adds to the search and the id of the next node (null = quiz over, go fight).
-// The `type` values are real Google Places API type strings, so stage 5 can
-// pass them straight through.
-// Round 1 (radius) is chosen on the radar screen before the quiz starts, so the
-// quiz itself begins at cuisine. The radar injects `radius` into the search.
 const QUIZ = {
     cuisine: {
         round: 2,
@@ -42,8 +29,6 @@ const QUIZ = {
 
 const QUIZ_START_NODE = 'cuisine';
 
-// Mock data: real, well-known Melbourne CBD spots so the demo feels genuine.
-// Coordinates are approximate; ratings/prices indicative. Replaced by live
 // Google data in stage 5, kept as the offline fallback.
 const MOCK_PLACES = [
     { id: 'gensuke',    name: 'Hakata Gensuke',      type: 'ramen_restaurant',     rating: 4.4, ratingCount: 3200, price: 2, address: '45 Russell St',        lat: -37.8129, lng: 144.9677 },
@@ -80,9 +65,7 @@ function distanceMeters(a, b) {
     return Math.round(2 * R * Math.asin(Math.sqrt(h)));
 }
 
-// Where is the player? Real geolocation when the phone allows it, Melbourne
-// CBD when it doesn't. Answer is cached so we only ever prompt once, and the
-// race guarantees a demo never stalls more than ~3.5s waiting for a fix.
+// Cache Answer
 let cachedCenter = null;
 
 async function getSearchCenter() {
@@ -100,19 +83,9 @@ async function getSearchCenter() {
     return cachedCenter;
 }
 
-// The one entry point the UI calls. Tries live Google Places first; ANY
-// failure (offline, key not activated, quota) silently falls back to the mock
-// data above, so the demo can never die on stage.
-//
-// A search must never come back empty just because the player is standing in
-// the wrong suburb: if the chosen radius finds nothing, widen the net (2.5km,
-// then 6km) before giving up, and as a last resort serve the mock list with
-// honest straight-line distances.
+// if the chosen radius finds nothing, widen the net
 async function searchRestaurants(filters) {
     const center = await getSearchCenter();
-    // Radar sends strict:true — the player picked this radius on purpose, so we
-    // honour it exactly and never silently widen. An empty result is honest
-    // ("no signals on radar") rather than a place 6km outside the scan.
     const strict = filters.strict === true;
     try {
         const attempts = strict
@@ -134,8 +107,7 @@ async function searchRestaurants(filters) {
     }
 }
 
-// Google's price enum -> our 1..4 scale. null = Google doesn't know, which we
-// let through every budget filter rather than wrongly hiding the place.
+// Google's price enum -> our 1..4 scale. null = Google doesn't know
 function priceLevelToNumber(level) {
     const map = {
         FREE: 1, INEXPENSIVE: 1, MODERATE: 2, EXPENSIVE: 3, VERY_EXPENSIVE: 4,

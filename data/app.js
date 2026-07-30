@@ -1,8 +1,4 @@
 // Food finder input bridge.
-//
-// App switching is owned by navigation.js (ESP32 WebSocket "nav" messages).
-// This file only boots FoodFinder and routes the cabinet's six keys to it
-// while the food-finder panel is the active app:
 //   joystick  -> ArrowUp / ArrowDown / ArrowLeft / ArrowRight
 //   A button  -> Enter   (select / confirm)
 //   B button  -> Escape  (back / cancel)
