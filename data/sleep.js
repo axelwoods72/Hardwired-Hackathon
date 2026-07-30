@@ -8,25 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (msg.type === "sleep" && document.getElementById("sleep-overlay").classList.contains("asleep")) {
             goAwake();
         } else if (msg.type === "reset") {
-            goSleep();
+            goSleep(true);
         }
     });
 });
 
-function sleepToggle(msg) {
-    if (document.body.classList.contains("asleep")) {
-        goAwake();
-    } else {
-        goSleep();
-    }
-}
-
-function goSleep() {
+function goSleep(on_reset) {
     document.getElementById("sleep-overlay").classList.add("asleep");
-    const msg = {
-        type: "sleep"
+    if (!on_reset) {
+        const msg = {
+            type: "sleep"
+        }
+        ws.send(JSON.stringify(msg));
     }
-    ws.send(JSON.stringify(msg));
 }
 
 function goAwake() {
@@ -36,5 +30,5 @@ function goAwake() {
 
 function resetSleepTimer() {
     clearTimeout(sleepTimer);
-    sleepTimer = setTimeout(goSleep, SLEEP_DELAY);
+    sleepTimer = setTimeout(goSleep, SLEEP_DELAY, false);
 }

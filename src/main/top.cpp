@@ -117,6 +117,7 @@ void setup()
   }
 
   // connect to WiFi
+  WiFi.disconnect(false, true);
   WiFi.begin(ssid, password);
   Serial.print("Connecting");
 
