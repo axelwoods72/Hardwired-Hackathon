@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let gameSpeed, score, gameOver, won;
   let lastObstacleTime, lastAlienTime, lastShotTime;
   let elapsed;
+  let started = false;
 
   // ---- background scenery ----
   const stars = [];
@@ -98,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     score = 0;
     gameOver = false;
     won = false;
+    started = false;
     lastObstacleTime = 0;
     lastAlienTime = 0;
     lastShotTime = 0;
@@ -121,10 +123,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') {
+      document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
+      runnerAppEl.classList.add('active');
+      document.getElementById('active-app-title').textContent = 'Runner';
+    }
+
+    if (!runnerAppEl.classList.contains('active')) return;
+
+    if (!started) {
+      if (e.key === 'Enter') started = true;
+      return;
+    }
+
     if (gameOver || won) {
-      if (e.key === 'Enter') resetGame();
+      if (e.key === 'Enter') resetGame(), (started = true);
       if (e.key === 'Escape') {
-        resetGame();
         document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
         document.getElementById('game-select-app').classList.add('active');
         document.getElementById('active-app-title').textContent = 'Game';
@@ -134,23 +148,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (e.key === 'ArrowUp') { e.preventDefault(); jump(); }
     if (e.key === 'ArrowDown') { e.preventDefault(); shoot(); }
-
-    // TEMP: press R to jump straight to the runner tile for testing tonight
-    if (e.key === 'r' || e.key === 'R') {
-      document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
-      runnerAppEl.classList.add('active');
-      document.getElementById('active-app-title').textContent = 'Runner';
-    }
   });
 
   window.ws?.addEventListener("message", (event) => {
     if (!runnerAppEl.classList.contains('active')) return;
     const msg = JSON.parse(event.data);
 
+    if (!started) {
+      if (msg.type === "sel") started = true;
+      return;
+    }
+
     if (gameOver || won) {
-      if (msg.type === "sel") resetGame();
+      if (msg.type === "sel") resetGame(), (started = true);
       if (msg.type === "sw") {
-        resetGame();
         document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
         document.getElementById('game-select-app').classList.add('active');
         document.getElementById('active-app-title').textContent = 'Game';
@@ -251,6 +262,36 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fillText(label, btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
+  function drawInstructions() {
+    ctx.fillStyle = '#0a0e2a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#c9b608';
+    ctx.font = 'bold 22px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('ALIEN INVASION', canvas.width / 2, canvas.height / 2 - 60);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '15px monospace';
+    ctx.fillText('LEFT BUTTON: JUMP OVER OBSTACLES', canvas.width / 2, canvas.height / 2 - 10);
+    ctx.fillText('PULL JOYSTICK DOWN: SHOOT ALIENS', canvas.width / 2, canvas.height / 2 + 16);
+
+    ctx.fillStyle = '#c9b608';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('PRESS SELECT TO START', canvas.width / 2, canvas.height / 2 + 65);
+  }
+
+  function drawHintBar() {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, canvas.height - 22, canvas.width, 22);
+    ctx.fillStyle = '#c9b608';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('LEFT BTN: JUMP   |   JOYSTICK DOWN: SHOOT', canvas.width / 2, canvas.height - 11);
+  }
+
   function drawCharacter() {
     const x = CHAR_X, y = charY;
     const cx = x + CHAR_W / 2;
@@ -318,9 +359,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!started) {
+      drawInstructions();
+      return;
+    }
+
     drawBackground(performance.now());
 
-    // ground below the sky — solid dark strip so it reads as distinct terrain
+    // ground below the sky
     ctx.fillStyle = '#12162e';
     ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
@@ -335,8 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
     drawCharacter();
 
     obstacles.forEach(o => {
-      const cx = o.x + o.w / 2;
-      const cy = o.y + o.h / 2;
       const grad = ctx.createLinearGradient(o.x, o.y, o.x, o.y + o.h);
       grad.addColorStop(0, '#d8d8d8');
       grad.addColorStop(1, '#9a9a9a');
@@ -397,6 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.textBaseline = 'top';
     ctx.fillText('SCORE: ' + Math.floor(score), 14, 14);
 
+    if (!gameOver && !won) drawHintBar();
+
     if (gameOver || won) {
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -416,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (lastTime === null) lastTime = timestamp;
       const dt = timestamp - lastTime;
       lastTime = timestamp;
-      if (!gameOver && !won) update(dt);
+      if (started && !gameOver && !won) update(dt);
       draw();
     } else {
       lastTime = null;
@@ -430,7 +477,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   canvas.addEventListener('click', (e) => {
+    if (!started) { started = true; return; }
     if (!gameOver && !won) return;
+
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -439,8 +488,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pointInBtn(clickX, clickY, restartBtn)) {
       resetGame();
+      started = true;
     } else if (pointInBtn(clickX, clickY, exitBtn)) {
-      resetGame();
       document.querySelectorAll('.app-function > div').forEach(el => el.classList.remove('active'));
       document.getElementById('game-select-app').classList.add('active');
       document.getElementById('active-app-title').textContent = 'Game';
